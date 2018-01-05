@@ -98,6 +98,17 @@ void init(){
 	 */
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	// 0. Bind VAO
+	glBindVertexArray(VAO);
+	// 1. Setup buffer
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	// 2. Vertex Attribute pointer
+	//location in vertex shader, vertex size, vertex type, normalize to 0-1?, stride - space
+	//between consecutive vertex attribute set, (void*) offset
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (void*)0);
+	glEnableVertexAttribArray(0);
+
 }
 
 
@@ -114,20 +125,11 @@ void processInput(GLFWwindow* window){
 
 void render(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	// 0. Bind VAO
-	glBindVertexArray(VAO);
-	// 1. Setup buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// 2. Vertex Attribute pointer
-	//location in vertex shader, vertex size, vertex type, normalize to 0-1?, stride - space
-	//between consecutive vertex attribute set, (void*) offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (void*)0);
-	glEnableVertexAttribArray(0);
 	// 4. draw
 	glUseProgram(shaderProgram);
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glBindVertexArray(0);
 }
 
 
