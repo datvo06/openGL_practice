@@ -16,6 +16,7 @@ GLfloat vertices[] = {
 	0.5f, -0.5f, 0.0f,
 	0.0f, 0.5f, 0.0f
 };
+GLuint VAO;
 GLuint VBO;
 GLuint vertexShader;
 GLuint fragmentShader;
@@ -51,6 +52,7 @@ int main ()
 		// Rendering
 		// Check poll events and swap buffer
 		glfwPollEvents();
+		render();
 		glfwSwapBuffers(window);
 	}
 	terminate();
@@ -61,6 +63,7 @@ int main ()
 void init(){
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &VAO);
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	const char* shaderSource = DatTools::Util::string_from_file("vertex.glsl").c_str();
 	glShaderSource(vertexShader, 1, &shaderSource, NULL);
@@ -111,17 +114,20 @@ void processInput(GLFWwindow* window){
 
 void render(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	// 0. Setup buffer
+	// 0. Bind VAO
+	glBindVertexArray(VAO);
+	// 1. Setup buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// 1. Vertex Attribute pointer
+	// 2. Vertex Attribute pointer
 	//location in vertex shader, vertex size, vertex type, normalize to 0-1?, stride - space
 	//between consecutive vertex attribute set, (void*) offset
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);
-	// 2. Use program
+	// 4. draw
 	glUseProgram(shaderProgram);
-	// 3. draw
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 
