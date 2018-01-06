@@ -10,5 +10,5 @@ uniform sampler2D faceTexture;
 void main(){
 	vec4 faceColor = texture(faceTexture, texCoord);
 	vec4 wallColor = texture(wallTexture, texCoord);
-	FragColor = faceColor;
+	FragColor = wallColor;
 }

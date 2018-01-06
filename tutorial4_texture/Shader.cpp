@@ -38,6 +38,8 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
 		glGetProgramInfoLog(ID, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
 	}
+	glDetachShader(ID, vertexShader);
+	glDetachShader(ID, fragmentShader);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
