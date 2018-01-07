@@ -4,13 +4,13 @@ out vec4 FragColor;
 in vec3 ourColor;
 in vec2 texCoord;
 
-// texture samplers
+
 uniform sampler2D wallTexture;
 uniform sampler2D faceTexture;
 
 void main()
 {
-	// Some comment
 	vec4 wallColor = texture(wallTexture, texCoord);
-	FragColor = wallColor;
+	vec4 faceColor = texture(faceTexture, texCoord);
+	FragColor = mix(wallColor, faceColor, 0.2)*vec4(ourColor, 1.0f);
 }

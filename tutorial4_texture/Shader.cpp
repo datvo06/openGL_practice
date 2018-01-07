@@ -2,18 +2,14 @@
 
 
 Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
-	const GLchar* vertexSource = DatTools::Util::string_from_file(std::string(vertexPath)).c_str();
-	const GLchar* fragmentSource = DatTools::Util::string_from_file(std::string(fragmentPath)).c_str();
 	GLuint vertexShader, fragmentShader;
-
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
 
 	GLint success;
 	GLchar infoLog[512];
 
-
+	const GLchar* vertexSource = DatTools::Util::string_from_file(std::string(vertexPath)).c_str();
 	glShaderSource(vertexShader, 1, &vertexSource, NULL);
 	glCompileShader(vertexShader);
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
@@ -21,6 +17,9 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
+	std::cout << "Vertex Source: " << vertexSource << std::endl;
+
+	const GLchar* fragmentSource = DatTools::Util::string_from_file(std::string(fragmentPath)).c_str();
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
 	glCompileShader(fragmentShader);
@@ -29,6 +28,8 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
+
+	std::cout << "Fragment Source: " << fragmentSource << std::endl;
 	this->ID = glCreateProgram();
 	glAttachShader(ID, vertexShader);
 	glAttachShader(ID, fragmentShader);
