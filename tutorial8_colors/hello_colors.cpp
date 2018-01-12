@@ -15,6 +15,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void draw_cubes(Camera& theCam);
+void draw_lamp(Camera& theCam);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void init();
 void render();
@@ -92,9 +94,10 @@ GLuint faceTexture;
 
 
 GLuint VAO;
+GLuint lampVAO;
 GLuint VBO;
 GLuint EBO;
-Shader* shaderProgram;
+Shader *shaderProgram, *lampProgram;
 
 
 Camera theCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f);
@@ -194,10 +197,11 @@ void init(){
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	initTexture();
 	shaderProgram = new Shader("vertex.glsl", "fragment.glsl");
-
+	lampProgram = new Shader("lamp_vertex.glsl", "lamp_fragment.glsl");
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
+	glGenVertexArrays(1, &lampVAO);
 		// 0. Bind VAO
 	glBindVertexArray(VAO);
 	// 1. Setup buffer
@@ -214,9 +218,19 @@ void init(){
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glBindVertexArray(lampVAO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)(0));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
 	shaderProgram->use();
 	shaderProgram->setInt("wallTexture", 0);
 	shaderProgram->setInt("faceTexture", 1);
+	shaderProgram->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+	shaderProgram->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 }
 
 
@@ -242,17 +256,24 @@ void processInput(GLFWwindow* window){
 }
 
 
+
 void render(){
 	currentTime = nextTime;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	// 4. draw
+	draw_cubes(theCamera);
+	draw_lamp(theCamera);
+	glBindVertexArray(0);
+}
+
+void draw_cubes(Camera& theCam){
 	shaderProgram->use();
 	glm::mat4 model;
 	glm::mat4 view;
 	// pos, target, up
-	view = theCamera.GetViewMatrix();
-	projection = glm::perspective(glm::radians(theCamera.Zoom), (float)screenWidth/screenHeight, 0.1f, 100.0f);
+	view = theCam.GetViewMatrix();
+	projection = glm::perspective(glm::radians(theCam.Zoom), (float)screenWidth/screenHeight, 0.1f, 100.0f);
 	shaderProgram->setMat4("view", glm::value_ptr(view));
 	shaderProgram->setMat4("projection", glm::value_ptr(projection));
 	glBindVertexArray(VAO);
@@ -270,6 +291,26 @@ void render(){
 		shaderProgram->setMat4("model", glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
+	glBindVertexArray(0);
+}
+
+
+void draw_lamp(Camera& theCam){
+	lampProgram->use();
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	// pos, target, up
+	view = theCam.GetViewMatrix();
+	projection = glm::perspective(glm::radians(theCam.Zoom), (float)screenWidth/screenHeight, 0.1f, 100.0f);
+	lampProgram->setMat4("view", glm::value_ptr(view));
+	lampProgram->setMat4("projection", glm::value_ptr(projection));
+	glBindVertexArray(lampVAO);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	model = glm::translate(model, lightPos);
+	model = glm::scale(model, glm::vec3(0.2f));
+	lampProgram->setMat4("model", glm::value_ptr(model));
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 }
 

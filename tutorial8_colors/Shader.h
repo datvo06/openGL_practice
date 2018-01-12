@@ -49,8 +49,18 @@ class Shader
 		 * @brief set the uniform, vec3
 		 * @param name : the name of the uniform in shader
 		 * @param value : the value to be set (float pointer)
+		 * @param _count : number of vecs
 		 */
-		void setVec3(const std::string &name, GLfloat* value) const;
+		void setVec3(const std::string &name, GLfloat* value, int _count=1) const;
+		/*
+		 * @brief set the uniform, vec3
+		 * @param name : the name of the uniform in shader
+		 * @param v0 : the value to be set (float pointer)
+		 * @param v1: the value to be set (float pointer)
+		 * @param v2 : the value to be set (float pointer)
+		 */
+		void setVec3(const std::string &name, GLfloat v0,
+				GLfloat v1, GLfloat v2) const;
 
 };
 #endif

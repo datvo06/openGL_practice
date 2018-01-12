@@ -1,7 +1,8 @@
 #include "Shader.h"
 
 
-Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
+
+Shader::Shader(const char* vertexPath, const char* fragmentPath){
 	GLuint vertexShader, fragmentShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -17,10 +18,10 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
-	std::cout << "Vertex Source: " << vertexSource << std::endl;
-
+	std::cout << vertexSource;
 	const GLchar* fragmentSource = DatTools::Util::string_from_file(std::string(fragmentPath)).c_str();
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
 	glCompileShader(fragmentShader);
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
@@ -28,8 +29,8 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath){
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
+	std::cout << fragmentSource;
 
-	std::cout << "Fragment Source: " << fragmentSource << std::endl;
 	this->ID = glCreateProgram();
 	glAttachShader(ID, vertexShader);
 	glAttachShader(ID, fragmentShader);
@@ -68,6 +69,11 @@ void Shader::setMat4(const std::string &name, GLfloat* value, GLuint transpose) 
 }
 
 
-void Shader::setVec3(const std::string &name, GLfloat* value) const{
-	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), 1, value);
+void Shader::setVec3(const std::string &name, GLfloat* value, int _count) const{
+	glUniform3fv(glGetUniformLocation(this->ID, name.c_str()), _count, value);
+}
+
+
+void Shader::setVec3(const std::string &name, GLfloat v1, GLfloat v2, GLfloat v3) const{
+	glUniform3f(glGetUniformLocation(this->ID, name.c_str()), v1, v2, v3);
 }
