@@ -284,7 +284,7 @@ void draw_cubes(Camera& theCam){
 		model = glm::translate(model, cubePositions[i]);
 		float angle = 20.0f*i;
 		model= glm::rotate(model, currentTime+angle, glm::vec3(1.0, 0.3, 0.5f));
-		//model = glm::scale(model, glm::vec3(fabs(sin(currentTime+angle)), fabs(sin(currentTime+angle)), 1.0f));
+		model = glm::scale(model, glm::vec3(fabs(sin(currentTime+angle)), fabs(sin(currentTime+angle)), 1.0f));
 		shaderProgram->setMat4("model", glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
