@@ -1,7 +1,6 @@
 #include "Shader.h"
 
 
-
 Shader::Shader(const char* vertexPath, const char* fragmentPath){
 	GLuint vertexShader, fragmentShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -10,7 +9,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath){
 	GLint success;
 	GLchar infoLog[512];
 
-	const GLchar* vertexSource = DatTools::Util::string_from_file(std::string(vertexPath)).c_str();
+  const GLchar* vertexSource = DatTools::Util::string_from_file_c(vertexPath);
 	glShaderSource(vertexShader, 1, &vertexSource, NULL);
 	glCompileShader(vertexShader);
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
@@ -19,7 +18,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath){
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 	std::cout << vertexSource;
-	const GLchar* fragmentSource = DatTools::Util::string_from_file(std::string(fragmentPath)).c_str();
+  const GLchar* fragmentSource = DatTools::Util::string_from_file_c(fragmentPath);
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
