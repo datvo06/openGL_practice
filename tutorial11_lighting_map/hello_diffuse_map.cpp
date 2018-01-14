@@ -24,47 +24,48 @@ void terminate();
 
 
 GLfloat vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    // positions          // normals           // texture coords
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
 
@@ -90,8 +91,8 @@ GLuint indices[] = {
 int width, height, nrChannels;
 GLuint screenWidth = 800;
 GLuint screenHeight = 600;
-GLuint wallTexture;
-GLuint faceTexture;
+GLuint diffuseMap;
+GLuint specMap;
 
 
 GLuint VAO;
@@ -104,7 +105,7 @@ Shader *shaderProgram, *lampProgram;
 Camera theCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f);
 
 glm::mat4 projection;
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.7f, 1.0f, 4.0f);
 
 float currentTime;
 float nextTime;
@@ -186,10 +187,10 @@ void loadTexture(GLuint textureID, const char* filepath, bool flipped=true){
 
 
 void initTexture(){
-	glGenTextures(1, &wallTexture);
-	glGenTextures(1, &faceTexture);
-	loadTexture(wallTexture, "wall.jpg");
-	loadTexture(faceTexture, "awesomeface.png");
+	glGenTextures(1, &diffuseMap);
+	loadTexture(diffuseMap, "container2.png");
+	glGenTextures(1, &specMap);
+	loadTexture(specMap, "container2_specular.png");
 }
 
 
@@ -212,20 +213,17 @@ void init(){
 	// 2. Vertex Attribute pointer
 	//location in vertex shader, vertex size, vertex type, normalize to 0-1?, stride - space
 	//between consecutive vertex attribute set, (void*) offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(6*sizeof(GLfloat)));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	glBindVertexArray(lampVAO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	shaderProgram->use();
-	shaderProgram->setInt("wallTexture", 0);
-	shaderProgram->setInt("faceTexture", 1);
-	shaderProgram->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-	shaderProgram->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 }
 
 
@@ -264,6 +262,21 @@ void render(){
 
 void draw_cubes(Camera& theCam){
 	shaderProgram->use();
+	shaderProgram->setInt("material.diffuse", 0);
+	shaderProgram->setInt("material.specular", 1);
+	shaderProgram->setFloat("material.shininess", 32.0f);
+
+	glm::vec3 lightColor;
+	lightColor.x = 1.0f;
+	lightColor.y = 1.0f;
+	lightColor.z = 1.0f;
+
+	glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+	shaderProgram->setVec3("light.ambient", glm::value_ptr(ambientColor));
+	shaderProgram->setVec3("light.diffuse", glm::value_ptr(diffuseColor));
+	shaderProgram->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 	glm::mat4 model;
 	glm::mat4 view;
 	// pos, target, up
@@ -275,16 +288,15 @@ void draw_cubes(Camera& theCam){
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 	glBindVertexArray(VAO);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, wallTexture);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, faceTexture);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindTexture(GL_TEXTURE_2D, specMap);
 	for(unsigned int i = 0; i < 10; i++){
 		glm::mat4 model;
 		model = glm::translate(model, cubePositions[i]);
 		float angle = 20.0f*i;
 		model= glm::rotate(model, currentTime+angle, glm::vec3(1.0, 0.3, 0.5f));
-		model = glm::scale(model, glm::vec3(fabs(sin(currentTime+angle)), fabs(sin(currentTime+angle)), 1.0f));
+		// model = glm::scale(model, glm::vec3(fabs(sin(angle)), fabs(sin(angle)), 1.0f));
 		shaderProgram->setMat4("model", glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}

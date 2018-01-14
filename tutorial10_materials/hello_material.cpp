@@ -213,12 +213,12 @@ void init(){
 	//location in vertex shader, vertex size, vertex type, normalize to 0-1?, stride - space
 	//between consecutive vertex attribute set, (void*) offset
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(0));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(lampVAO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(0));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	shaderProgram->use();
