@@ -275,6 +275,7 @@ void draw_cubes(Camera& theCam){
 	glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
+	shaderProgram->setVec3("light.position", glm::value_ptr(lightPos));
 	shaderProgram->setVec3("light.ambient", glm::value_ptr(ambientColor));
 	shaderProgram->setVec3("light.diffuse", glm::value_ptr(diffuseColor));
 	shaderProgram->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
@@ -285,7 +286,6 @@ void draw_cubes(Camera& theCam){
 	projection = glm::perspective(glm::radians(theCam.Zoom), (float)screenWidth/screenHeight, 0.1f, 100.0f);
 	shaderProgram->setMat4("view", glm::value_ptr(view));
 	shaderProgram->setMat4("projection", glm::value_ptr(projection));
-	shaderProgram->setVec3("lightPos", glm::value_ptr(lightPos));
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 	glBindVertexArray(VAO);
 	glActiveTexture(GL_TEXTURE0);

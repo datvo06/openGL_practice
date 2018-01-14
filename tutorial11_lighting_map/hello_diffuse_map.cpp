@@ -274,6 +274,7 @@ void draw_cubes(Camera& theCam){
 	glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
+	shaderProgram->setVec3("light.position", glm::value_ptr(lightPos));
 	shaderProgram->setVec3("light.ambient", glm::value_ptr(ambientColor));
 	shaderProgram->setVec3("light.diffuse", glm::value_ptr(diffuseColor));
 	shaderProgram->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
