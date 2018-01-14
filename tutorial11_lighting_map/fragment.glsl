@@ -7,15 +7,6 @@ struct Material {
 
 uniform Material material;
 
-
-struct DirectionalLight {
-	vec3 direction; // Note how we replace position with direction
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-};
-
-
 struct Light {
 	vec3 position;
 	vec3 ambient;
@@ -24,7 +15,6 @@ struct Light {
 };
 
 uniform Light light;
-uniform DirectionalLight dirlight;
 
 out vec4 FragColor;
 
