@@ -21,6 +21,10 @@ struct Light {
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
 };
 
 uniform Light light;
@@ -37,19 +41,39 @@ uniform vec3 viewPos;
 
 void main()
 {
+	float distance = length(light.position - FragPos);
+	float positional_attentuation = 1.0f/(light.constant + light.linear*distance + light.quadratic * distance * distance);
 	// Ambient
-	vec3 ambient = vec3(texture(material.diffuse, texCoord))* dirlight.ambient;
+	vec3 directional_ambient = vec3(texture(material.diffuse, texCoord))* dirlight.ambient;
+	vec3 positional_ambient = vec3(texture(material.diffuse, texCoord))* light.ambient * positional_attentuation;
+	vec3 ambient = directional_ambient + positional_ambient;
 
 	// Diffuse
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(-dirlight.direction);
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * vec3(texture(material.diffuse, texCoord))* dirlight.diffuse;
+	// Directional Diffuse
+	vec3 directional_lightDir = normalize(-dirlight.direction);
+	float diff = max(dot(norm, directional_lightDir), 0.0);
+	vec3 directional_diffuse = diff * vec3(texture(material.diffuse, texCoord))* dirlight.diffuse;
+	// Positional Diffuse
+	vec3 positional_lightDir = normalize(FragPos - lightPos);
+	float positional_diff = max(dot(norm, positional_lightDir), 0.0);
+	vec3 positional_diffuse = diff * vec3(texture(material.diffuse, texCoord))* light.diffuse * positional_attentuation;
+	vec3 diffuse = directional_diffuse + positional_diffuse;
+
 	// Specular
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec3 specular = (vec3(texture(material.specular, texCoord)) * spec) * dirlight.specular;
+
+	// Directional Specular
+	vec3 directional_reflectDir = reflect(-directional_lightDir, norm);
+	float directional_spec = pow(max(dot(viewDir, directional_reflectDir), 0.0), material.shininess);
+	vec3 directional_specular = (vec3(texture(material.specular, texCoord)) * directional_spec) * dirlight.specular * positional_attentuation;
+
+	// Positional Specular
+	vec3 positional_reflectDir = reflect(-positional_lightDir, norm);
+	float positional_spec = pow(max(dot(viewDir, positional_reflectDir), 0.0), material.shininess);
+	vec3 positional_specular = (vec3(texture(material.specular, texCoord)) * positional_spec) * light.specular * positional_attentuation;
+
+	vec3 specular = directional_specular + positional_specular;
 
 	vec3 result = ambient + diffuse + specular;
 	FragColor = vec4(result, 1.0);
