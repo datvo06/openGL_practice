@@ -3,8 +3,7 @@
 #include <Shader.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <CustomizedImageLoading/stb_image.h>
-#include <CustomizedModelLoading/Mesh.h>
+#include <CustomizedModelLoading/Model.h>
 
 
 #include <glm/glm.hpp>
@@ -13,16 +12,18 @@
 #include <Camera.h>
 
 
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void draw_cubes(Camera& theCam);
+void draw_model(Camera& theCam);
 void draw_lamp(Camera& theCam);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void init();
 void render();
 void terminate();
 
+Model* pModel;
 
 GLfloat vertices[] = {
     // positions          // normals           // texture coords
@@ -70,19 +71,6 @@ GLfloat vertices[] = {
 };
 
 
-glm::vec3 cubePositions[] = {
-	glm::vec3(0.0f, 0.0f, 0.0f),
-	glm::vec3(2.0f, 5.0f, -15.0f),
-	glm::vec3(-1.5f, -2.2f, -2.5f),
-	glm::vec3(-3.8f, -2.0f, -12.3f),
-	glm::vec3(2.4f, -0.4f, 3.5f),
-	glm::vec3(-1.7f, 3.0f, -7.5f),
-	glm::vec3(1.3f, -2.0f, -2.5f),
-	glm::vec3(1.5f, 2.0f, -2.5f),
-	glm::vec3(1.5f, 0.2f, -1.5f),
-	glm::vec3(-1.3f, 1.0f, -1.5f)
-};
-
 glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.7f, 0.2f, 2.0f),
 	glm::vec3(2.3f, -3.3f, -4.0f),
@@ -96,14 +84,10 @@ GLuint indices[] = {
 	1, 2, 3
 };
 
-int width, height, nrChannels;
 GLuint screenWidth = 800;
 GLuint screenHeight = 600;
-GLuint diffuseMap;
-GLuint specMap;
 
 
-GLuint VAO;
 GLuint lampVAO;
 GLuint VBO;
 GLuint EBO;
@@ -164,55 +148,17 @@ int main ()
 }
 
 
-void loadTexture(GLuint textureID, const char* filepath, bool flipped=true){
-	stbi_set_flip_vertically_on_load(flipped);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	unsigned char *data;
-	data = stbi_load(filepath, &width, &height, &nrChannels, 0);
-	unsigned int type_load;
-	if(nrChannels == 3)
-		type_load = GL_RGB;
-	else 
-		type_load = GL_RGBA;
-
-	if (data)
-	{
-		// Texture currently bound, mipmap manually create, type to store, width, height, always 0, format datatype of source image, image data
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, type_load, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	// done with the image
-	stbi_image_free(data);
-
-}
-
-
-void initTexture(){
-	glGenTextures(1, &diffuseMap);
-	loadTexture(diffuseMap, "container2.png");
-	glGenTextures(1, &specMap);
-	loadTexture(specMap, "container2_specular.png");
-}
-
-
 void init(){
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	initTexture();
+	std::cout << "Loading model..." << std::endl;
+	pModel  = new Model("./nanosuit/nanosuit.obj");
+	std::cout << "Loading Shader..." << std::endl;
 	shaderProgram = new Shader("vertex.glsl", "fragment.glsl");
 	lampProgram = new Shader("vertex.glsl", "lamp_fragment.glsl");
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
 	glGenVertexArrays(1, &lampVAO);
 		// 0. Bind VAO
-	glBindVertexArray(VAO);
 	// 1. Setup buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -221,12 +167,6 @@ void init(){
 	// 2. Vertex Attribute pointer
 	//location in vertex shader, vertex size, vertex type, normalize to 0-1?, stride - space
 	//between consecutive vertex attribute set, (void*) offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(6*sizeof(GLfloat)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
 	glBindVertexArray(lampVAO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
@@ -263,15 +203,13 @@ void render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	// 4. draw
-	draw_cubes(theCamera);
+	draw_model(theCamera);
 	draw_lamp(theCamera);
 	glBindVertexArray(0);
 }
 
-void draw_cubes(Camera& theCam){
+void draw_model(Camera& theCam){
 	shaderProgram->use();
-	shaderProgram->setInt("material.diffuse", 0);
-	shaderProgram->setInt("material.specular", 1);
 	shaderProgram->setFloat("material.shininess", 32.0f);
 
 	glm::vec3 lightColor;
@@ -300,29 +238,20 @@ void draw_cubes(Camera& theCam){
 	}
 	
 	glm::mat4 model;
-	glm::mat4 view;
+	glm::mat4 view = theCam.GetViewMatrix();
 	// pos, target, up
-	view = theCam.GetViewMatrix();
+	
 	projection = glm::perspective(glm::radians(theCam.Zoom), (float)screenWidth/screenHeight, 0.1f, 100.0f);
 	shaderProgram->setMat4("view", glm::value_ptr(view));
 	shaderProgram->setMat4("projection", glm::value_ptr(projection));
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
-	glBindVertexArray(VAO);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, diffuseMap);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, specMap);
-	for(unsigned int i = 0; i < 10; i++){
-		glm::mat4 model;
-		model = glm::translate(model, cubePositions[i]);
-		float angle = 20.0f*i;
-		model= glm::rotate(model, currentTime+angle, glm::vec3(1.0, 0.3, 0.5f));
-		// model = glm::scale(model, glm::vec3(fabs(sin(angle)), fabs(sin(angle)), 1.0f));
-		shaderProgram->setMat4("model", glm::value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
-	glBindVertexArray(0);
+
+	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	shaderProgram->setMat4("model", glm::value_ptr(model));
+	pModel->Draw(*shaderProgram);
 }
+
 
 
 void draw_lamp(Camera& theCam){
@@ -367,8 +296,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 
 
 void terminate(){
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VAO);
+	glDeleteBuffers(1, &lampVAO);
+	glDeleteBuffers(1, &EBO);
 	glDeleteBuffers(1, &VBO);
 	glfwTerminate();
 }

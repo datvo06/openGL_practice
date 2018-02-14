@@ -44,21 +44,18 @@ void Mesh::Draw(Shader shader){
 	for (GLuint i = 0; i < textures.size(); i++){
 		glActiveTexture(GL_TEXTURE0+i); // Active proper texture uint before binding
 		// retrieve texture number ( the N in diffuse_tetureN )
-		std::stringstream ss;
 		std::string number;
 		std::string name = textures[i].type;
 		if (name == "texture_diffuse")
-			ss << diffuseNr++; 	// Transfer unsigned int to stream
+			number = std::to_string(diffuseNr++); 	// Transfer unsigned int to stream
 		else if(name == "texture_specular")
-			ss << specularNr++; // Transfer unsigned int to stream
-		number = ss.str();
-		shader.setFloat(("material." + name + number).c_str(), i);
+			number = std::to_string(specularNr++); 	// Transfer unsigned int to stream
+		shader.setInt(("material." + name + number).c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
-	glActiveTexture(GL_TEXTURE0);
-
 	// draw mesh
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
 }

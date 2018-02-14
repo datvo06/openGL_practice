@@ -1,3 +1,5 @@
+#ifndef __CUSTOMIZED_MESH__
+#define __CUSTOMIZED_MESH__
 #include <CustomizedModelLoading/Texture.h>
 #include <CustomizedModelLoading/Vertex.h>
 #include <Shader.h>
@@ -20,3 +22,4 @@ class Mesh{
 		/* Functions */
 		void setupMesh();
 };
+#endif
