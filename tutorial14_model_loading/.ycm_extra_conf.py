@@ -46,7 +46,7 @@ flags = [
 '-isystem',
 '/usr/include',
 '-isystem',
-'/media/theengineer/Main2/openGL_practice/tutorial14_model_loading/include',
+'/media/theengineer/Main2/openGL_practice/include',
 '-isystem',
 '/usr/local/include',
 '-isystem',
