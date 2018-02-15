@@ -8,5 +8,5 @@ uniform sampler2D frameTexture;
 
 void main(){
 	//FragColor = mix(texture(wallTexture, texCoord), texture(faceTexture, texCoord), 0.2);
-	FragColor = texture(frameTexture, texCoord);
+	FragColor = vec4(texture(frameTexture, texCoord).xyz, 1.0);
 }

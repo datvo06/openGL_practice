@@ -27,10 +27,10 @@ void terminate();
 Model* pModel;
 
 GLfloat quadVertices[] = {
-	0.5f, 0.5f, 0.0f, 1.0f, 1.0f,		// top right
-	0.5f, -0.5f, 0.0f, 1.0f, 0.0f,	// bottom right
-	-0.5f, -0.5f, 0.0f,	0.0f, 0.0f,	// bottom left
-	-0.5f, 0.5f, 0.0f, 0.0f, 1.0f			// top left
+	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,		// top right
+	1.0f, -1.0f, 0.0f, 1.0f, 0.0f,	// bottom right
+	-1.0f, -1.0f, 0.0f,	0.0f, 0.0f,	// bottom left
+	-1.0f, 1.0f, 0.0f, 0.0f, 1.0f			// top left
 };
 
 GLuint quadIndices[] = {
@@ -93,8 +93,8 @@ glm::vec3 pointLightPositions[] = {
 
 
 GLuint indices[] = {
-	0, 1, 3,
-	1, 2, 3
+	1, 0, 3,
+	2, 1, 3
 };
 
 GLuint screenWidth = 800;
@@ -115,7 +115,7 @@ GLuint EBO;
 Shader *shaderProgram, *lampProgram, *textureBufferProgram;
 
 
-Camera theCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f);
+Camera theCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 glm::mat4 projection;
 glm::vec3 lightPos(1.7f, 1.0f, 4.0f);
@@ -170,7 +170,6 @@ int main ()
 
 
 void init(){
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	std::cout << "Loading model..." << std::endl;
 	pModel  = new Model("./nanosuit/nanosuit.obj");
 	std::cout << "Loading Shader..." << std::endl;
@@ -208,6 +207,8 @@ void init(){
 	*/
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	// glBindTexture(GL_TEXTURE_2D, 0);
+
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
 
 	glGenRenderbuffers(1, &RBO);
@@ -271,6 +272,7 @@ void render(){
 	// 4. draw
 	// 4.1 Render with new framebuffer bound
   glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -331,6 +333,7 @@ void draw_model(Camera& theCam){
 
 
 void draw_lamp(Camera& theCam){
+	glDisable(GL_CULL_FACE);
 	lampProgram->use();
 	glm::mat4 view;
 	// pos, target, up
@@ -348,15 +351,18 @@ void draw_lamp(Camera& theCam){
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
+	glEnable(GL_CULL_FACE);
 }
 
 
 void draw_framebuffer(){
-	// glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	// glClear(GL_COLOR_BUFFER_BIT);
+	
 	textureBufferProgram->use();
 	glBindVertexArray(quadVAO);
 	glDisable(GL_DEPTH_TEST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	textureBufferProgram->setInt("frameTexture", 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
