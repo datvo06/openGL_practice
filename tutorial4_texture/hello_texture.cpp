@@ -169,6 +169,7 @@ void render(){
 	glBindTexture(GL_TEXTURE_2D, wallTexture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, faceTexture);
+	// glEnable(GL_CULL_FACE);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

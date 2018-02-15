@@ -18,12 +18,25 @@ void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void draw_model(Camera& theCam);
 void draw_lamp(Camera& theCam);
+void draw_framebuffer();
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void init();
 void render();
 void terminate();
 
 Model* pModel;
+
+GLfloat quadVertices[] = {
+	0.5f, 0.5f, 0.0f, 1.0f, 1.0f,		// top right
+	0.5f, -0.5f, 0.0f, 1.0f, 0.0f,	// bottom right
+	-0.5f, -0.5f, 0.0f,	0.0f, 0.0f,	// bottom left
+	-0.5f, 0.5f, 0.0f, 0.0f, 1.0f			// top left
+};
+
+GLuint quadIndices[] = {
+	1, 0, 3,
+	2, 1, 3
+};
 
 GLfloat vertices[] = {
     // positions          // normals           // texture coords
@@ -88,10 +101,18 @@ GLuint screenWidth = 800;
 GLuint screenHeight = 600;
 
 
+GLuint FBO;
+GLuint texColorBuffer;
+GLuint RBO;
+
+GLuint quadVAO;
+GLuint quadVBO;
+GLuint quadEBO;
+
 GLuint lampVAO;
 GLuint VBO;
 GLuint EBO;
-Shader *shaderProgram, *lampProgram, *stencilProgram;
+Shader *shaderProgram, *lampProgram, *textureBufferProgram;
 
 
 Camera theCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f);
@@ -155,11 +176,58 @@ void init(){
 	std::cout << "Loading Shader..." << std::endl;
 	shaderProgram = new Shader("vertex.glsl", "fragment.glsl");
 	lampProgram = new Shader("vertex.glsl", "lamp_fragment.glsl");
-	stencilProgram = new Shader("vertex.glsl", "fragment_stencil.glsl");
+	textureBufferProgram = new Shader("vertex_backup.glsl", "fragment_backup.glsl");
+
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+	glGenBuffers(1, &quadEBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)(0));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glBindVertexArray(0);
+
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &lampVAO);
-		// 0. Bind VAO
+
+	glGenFramebuffers(1, &FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+	glGenTextures(1, &texColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+ 	glTexImage2D(GL_TEXTURE_2D,	0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	/*
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	*/
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+
+	glGenRenderbuffers(1, &RBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+	/*
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texColorBuffer, 0);
+	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+	*/
+
+	// glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// target, attachment, textarget, texture, level
+	// 0. Bind VAO
 	// 1. Setup buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -198,15 +266,22 @@ void processInput(GLFWwindow* window){
 }
 
 
-
 void render(){
 	currentTime = nextTime;
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	// 4. draw
+	// 4.1 Render with new framebuffer bound
+  glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	// 4. draw
+
 	draw_model(theCamera);
 	draw_lamp(theCamera);
+	// 4.2 Bind to default framebuffer
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	draw_framebuffer();
+	// 4.3 draw quad span fullcenter with texture as bound
 	glBindVertexArray(0);
 }
 
@@ -239,7 +314,7 @@ void draw_model(Camera& theCam){
 		shaderProgram->setFloat((pointString+"quadratic"), 0.032f);
 	}
 	
-	glm::mat4 model, model_stencil;
+	glm::mat4 model;
 	glm::mat4 view = theCam.GetViewMatrix();
 	// pos, target, up
 	
@@ -248,29 +323,11 @@ void draw_model(Camera& theCam){
 	shaderProgram->setMat4("projection", glm::value_ptr(projection));
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 
+	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
 	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 	shaderProgram->setMat4("model", glm::value_ptr(model));
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilMask(0xFF);
 	pModel->Draw(*shaderProgram);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilMask(0x00);
-	glDisable(GL_DEPTH_TEST);
-	stencilProgram->use();
-	stencilProgram->setMat4("view", glm::value_ptr(view));
-	stencilProgram->setMat4("projection", glm::value_ptr(projection));
-
-	model_stencil	= glm::scale(model_stencil, glm::vec3(0.21f, 0.21f, 0.21f));	// it's a bit too big for our scene, so scale it down
-	stencilProgram->setMat4("model", glm::value_ptr(model_stencil));
-	pModel->Draw(*stencilProgram);
-	glEnable(GL_DEPTH_TEST);
-	glStencilMask(0xFF);
 }
-
 
 
 void draw_lamp(Camera& theCam){
@@ -290,6 +347,20 @@ void draw_lamp(Camera& theCam){
 		lampProgram->setMat4("model", glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
+	glBindVertexArray(0);
+}
+
+
+void draw_framebuffer(){
+	// glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	// glClear(GL_COLOR_BUFFER_BIT);
+	textureBufferProgram->use();
+	glBindVertexArray(quadVAO);
+	glDisable(GL_DEPTH_TEST);
+	textureBufferProgram->setInt("frameTexture", 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 

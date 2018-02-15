@@ -1,5 +1,5 @@
 all:
-	g++ -std=c++11 -o window.exe hello_model_loading.cpp /media/theengineer/Main2/openGL_practice/src/Shader.cpp\
+	g++ -std=c++11 -o window.exe hello_framebuffer.cpp /media/theengineer/Main2/openGL_practice/src/Shader.cpp\
 	 	/media/theengineer/Main2/openGL_practice/src/stb_image.cpp \
 		/media/theengineer/Main2/openGL_practice/src/CustomizedModelLoading/Mesh.cpp \
 	 	/media/theengineer/Main2/openGL_practice/src/CustomizedModelLoading/Texture.cpp \
