@@ -84,7 +84,9 @@ void main()
 {
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 R = reflect(-viewDir, norm);
+	// vec3 R = reflect(-viewDir, norm); for reflect
+	float ratio = 1.00/1.52;
+	vec3 R = refract(-viewDir, norm, ratio);
 	/*
 	vec3 result = CalcDirLight(dirlight, norm, viewDir);
 	for (int i = 0; i < NR_POINT_LIGHTS; i++){
