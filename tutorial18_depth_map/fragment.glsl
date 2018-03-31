@@ -79,6 +79,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){
 	return (ambient + diffuse + specular);
 }
 
+in vec4 CamSpacePos;
 
 void main()
 {
@@ -94,5 +95,9 @@ void main()
 	// FragColor = vec4(result, 1.0);
 	// FragColor = vec4(texture(skybox, R).rgb, 1.0f);
 	// FragColor = vec4(mix(texture(skybox, R).rgb,  result, 0.2f), 1.0f);
-	FragColor = vec4(FragPos.z, FragPos.z, FragPos.z, 1.0f);
+	// FragColor = vec4(gl_Position.z, gl_Position.z, gl_Position.z, 1.0f);
+	float ndcDepth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far) / (gl_DepthRange.far - gl_DepthRange.near);
+	float clipDepth = ndcDepth/ gl_FragCoord.w;
+	float originalZ =  gl_FragCoord.z/gl_FragCoord.w;
+	FragColor = vec4(ndcDepth, ndcDepth, ndcDepth, 1.0);
 }

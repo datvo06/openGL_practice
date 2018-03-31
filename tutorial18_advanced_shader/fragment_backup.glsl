@@ -76,10 +76,10 @@ vec4 kernel3_3_apply_gray(float kernel[9], float offsetx, float offsety){
 
 
 void main(){
-	// FragColor = vec4(texture(frameTexture, fs_in.texCoord).xyz, 1.0); 	// original color
+	FragColor = vec4(texture(frameTexture, fs_in.texCoord).xyz, 1.0); 	// original color
 	// FragColor = vec4(vec3(1.0 - texture(frameTexture, fs_in.texCoord).xyz), 1.0); //invert color
-	FragColor = grayScale(texture(frameTexture, fs_in.texCoord)); //grayScale
+	// FragColor = grayScale(texture(frameTexture, fs_in.texCoord)); //grayScale
 	// FragColor = kernel3_3_apply(blur_kernel, 1.0f/400.0f, 1.0f/300.0f); //blur
 	// FragColor = kernel3_3_apply(edge_kernel, 1.0f/400.0f, 1.0f/300.0f); // edge
-	FragColor = kernel3_3_apply_gray(edge_kernel, 1.0f/400.0f, 1.0f/300.0f); // edge
+	// FragColor = kernel3_3_apply_gray(edge_kernel, 1.0f/400.0f, 1.0f/300.0f); // edge
 }
