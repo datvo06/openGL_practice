@@ -2,6 +2,7 @@
 #define __DAT_STRING_UTILS
 #include <string>
 #include <boost/algorithm/string.hpp>
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <sstream>
