@@ -21,7 +21,7 @@ void draw_lamp(Camera& theCam);
 void draw_framebuffer();
 void draw_cubemap(Camera& theCam);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void init();
+void init(std::string modelPath = "");
 void render();
 void terminate();
 
@@ -201,7 +201,7 @@ std::vector<std::string> cubeFaces{
 
 GLuint cubemapTexture;
 
-int main ()
+int main (int argc, char** argv)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -226,7 +226,7 @@ int main ()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
-	init();
+	init(argv[1]);
 	while(!glfwWindowShouldClose(window)){
 		nextTime = glfwGetTime();
 		// Input
@@ -266,9 +266,9 @@ GLuint loadCubemap(std::vector<std::string> faces){
 }
 
 
-void init(){
+void init(std::string modelPath){
 	std::cout << "Loading model..." << std::endl;
-	pModel  = new Model("./nanosuit/nanosuit.obj");
+	pModel  = new Model(modelPath.c_str());
 	std::cout << "Loading Shader..." << std::endl;
 	cubemapTexture = loadCubemap(cubeFaces);
 	shaderProgram = new Shader("vertex.glsl", "fragment.glsl");

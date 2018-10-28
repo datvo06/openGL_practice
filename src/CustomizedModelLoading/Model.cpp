@@ -24,7 +24,9 @@ void Model::loadModel(std::string path){
 
 void Model::processNode(aiNode *node, const aiScene *scene){
 	// process all the node's meshes (if any)
+	printf("Number of meshes in node: %d\n", node->mNumMeshes);
 	for (unsigned int i = 0; i < node->mNumMeshes; i++){
+		printf("Accessing mesh: %d\n", node->mMeshes[i]);
 		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(processMesh(mesh, scene));
 	}
@@ -39,6 +41,7 @@ void Model::processNode(aiNode *node, const aiScene *scene){
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene){
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
+	int dIndex = 0;
 	std::vector<Texture> textures;
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++){
 		Vertex vertex;
@@ -54,7 +57,9 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene){
 		the_vector.y = mesh->mNormals[i].y;
 		the_vector.z = mesh->mNormals[i].z;
 		vertex.Normal = the_vector;	
+		printf("Here %d\n", dIndex++);
 		if (mesh->mTextureCoords[0]){
+			printf("Here %d\n", dIndex++);
 			glm::vec2 vec;
 			vec.x = mesh->mTextureCoords[0][i].x;
 			vec.y = mesh->mTextureCoords[0][i].y;

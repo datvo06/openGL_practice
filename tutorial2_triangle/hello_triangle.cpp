@@ -65,7 +65,7 @@ void init(){
 	glGenBuffers(1, &VBO);
 	glGenVertexArrays(1, &VAO);
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	const char* shaderSource = DatTools::Util::string_from_file("vertex.glsl").c_str();
+	const char* shaderSource = DatTools::Util::string_from_file_cpp("vertex.glsl").c_str();
 	glShaderSource(vertexShader, 1, &shaderSource, NULL);
 	glCompileShader(vertexShader);
 	GLint success;
@@ -75,7 +75,7 @@ void init(){
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
-	const char* fragmentShaderSource = DatTools::Util::string_from_file("fragment.glsl").c_str();
+	const char* fragmentShaderSource = DatTools::Util::string_from_file_cpp("fragment.glsl").c_str();
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
