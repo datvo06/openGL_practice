@@ -3,8 +3,8 @@
 #include "Mesh.h"
 #include <CTM/mesh.h>
 
-class CTMMeshAdaptor: public Mesh{
+class MeshFactory {
 	public:
-		CTMMeshAdaptor(CTM::Mesh ctmMesh);
-};
+		std::unique_ptr<glMesh> getMesh(CTM::Mesh ctmMesh);
+}
 #endif

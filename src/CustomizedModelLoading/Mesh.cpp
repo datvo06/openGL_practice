@@ -10,6 +10,15 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices,
 }
 
 
+Mesh::Mesh(){
+}
+
+
+bool Mesh::hasColors(){
+	return (mColors.size() >= 0) && (mColors.size() == vertices.size());
+}
+
+
 void Mesh::setupMesh()
 {
 	glGenVertexArrays(1, &VAO);

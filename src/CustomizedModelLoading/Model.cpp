@@ -38,7 +38,7 @@ void Model::processNode(aiNode *node, const aiScene *scene){
 }
 
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene){
+TexturedMesh Model::processMesh(aiMesh *mesh, const aiScene *scene){
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
 	int dIndex = 0;

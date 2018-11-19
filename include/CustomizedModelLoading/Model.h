@@ -6,15 +6,15 @@
 #include <assimp/postprocess.h>
 
 
-class Model{
+class TexturedModel{
 	public:
 		/* Functions */
-		Model(const char *path){
+		TexturedModel(const char *path){
 			loadModel(path);
 		}
 		void Draw(Shader shader);
 	private:
-		std::vector<Mesh> meshes;
+		std::vector<glMesh> meshes;
 		std::string directory;
 		/* Function */
 		void loadModel(std::string path);
