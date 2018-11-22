@@ -6,11 +6,14 @@
 #include <assimp/scene.h>
 #include <iostream>
 
-struct Texture {
-	GLuint id;
-	std::string type;
-	aiString path;
-};
+namespace DatCustom{
+	namespace Graphics{
+		struct Texture {
+			GLuint id;
+			std::string type;
+		};
+	}
+}
 
 GLint TextureFromFile(const char* path, std::string directory);
 #endif
