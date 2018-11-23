@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <Camera.h>
+#include <CustomizedModelLoading/MeshManager.hpp>
 
 
 
@@ -25,7 +26,9 @@ void init(std::string modelPath = "");
 void render();
 void terminate();
 
-Model* pModel;
+using DatCustom::Graphics::MeshPtr;
+using DatCustom::Graphics::MeshManager;
+MeshPtr pModel;
 
 GLfloat quadVertices[] = {
 	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,		// top right
@@ -268,7 +271,7 @@ GLuint loadCubemap(std::vector<std::string> faces){
 
 void init(std::string modelPath){
 	std::cout << "Loading model..." << std::endl;
-	pModel  = new Model(modelPath.c_str());
+	pModel = MeshManager::instance().loadStaticMesh(modelPath.c_str());
 	std::cout << "Loading Shader..." << std::endl;
 	cubemapTexture = loadCubemap(cubeFaces);
 	shaderProgram = new Shader("vertex.glsl", "fragment.glsl");
