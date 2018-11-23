@@ -19,9 +19,13 @@ DatCustom::Graphics::TexturePtr TextureManager::loadTextureFromFile(const char* 
 		pTexture->id = textureID;
 		pTexture->type = typeName;
 		loadedTextures.insert({filePath, pTexture});
-		return pTexture;
+		// Only return a copy
+		return TexturePtr(new Texture({
+				loadedTextures[filePath]->id,
+				loadedTextures[filePath]->type}));
 	}
 	else{
-		return it->second;
+		// Only return a copy
+		return TexturePtr(new Texture({it->second->id, typeName}));
 	}
 }
