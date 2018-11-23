@@ -46,7 +46,7 @@ in vec2 texCoord;
 in vec4 vertexColor;
 
 uniform vec3 viewPos;
-uniform hasTexture;
+uniform bool hasTexture;
 
 #define NR_POINT_LIGHTS 4
 uniform PointLight pointLights[NR_POINT_LIGHTS];

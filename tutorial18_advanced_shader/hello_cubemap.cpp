@@ -271,7 +271,7 @@ GLuint loadCubemap(std::vector<std::string> faces){
 
 void init(std::string modelPath){
 	std::cout << "Loading model..." << std::endl;
-	pModel = MeshManager::instance().loadStaticMesh(modelPath.c_str());
+	pModel.reset(&*MeshManager::instance().loadStaticMesh(modelPath.c_str()));
 	std::cout << "Loading Shader..." << std::endl;
 	cubemapTexture = loadCubemap(cubeFaces);
 	shaderProgram = new Shader("vertex.glsl", "fragment.glsl");

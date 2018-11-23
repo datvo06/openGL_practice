@@ -20,11 +20,11 @@ DatCustom::Graphics::MeshPtr MeshManager::createMeshFromCTM(CTM::Mesh& ctmMesh){
 		ctmMesh.CalculateNormals();
 	}
 	// Still assigning colors, but doing nothing with it for now
-	if (ctmMesh.HasColors()){
+	if (!ctmMesh.HasTexCoords()) {
 		// Get vector of vertex, color, etc
 		return std::unique_ptr<glMesh>(new ColoredMesh(ctmMesh));
 	}
-	else {
+	else{
 		return std::unique_ptr<glMesh>(new TexturedMesh(ctmMesh));
 	}
 }

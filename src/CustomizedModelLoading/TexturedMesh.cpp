@@ -19,9 +19,8 @@ namespace DatCustom{
 
 		TexturedMesh::TexturedMesh(CTM::Mesh& ctmMesh){
 			// Let's create textured vertices
-			this->vertices.resize(ctmMesh.mVertices.size());
-			this->indices.resize(ctmMesh.mIndices.size());
 			for (size_t i = 0; i < ctmMesh.mVertices.size(); i++){
+				this->vertices.push_back(TexturedVertex());
 				this->vertices[i].Position = {ctmMesh.mVertices[i].x,
 					ctmMesh.mVertices[i].y,
 					ctmMesh.mVertices[i].z
@@ -36,7 +35,7 @@ namespace DatCustom{
 			}
 			// And Copy indices as well
 			for (size_t i = 0; i < ctmMesh.mIndices.size(); i++){
-				this->indices[i] = ctmMesh.mIndices[i];
+				this->indices.push_back(ctmMesh.mIndices[i]);
 			}
 			textures.push_back(*TextureManager::instance().loadTextureFromFile(ctmMesh.mTexFileName.c_str(), "texture_diffuse"));
 			textures.push_back(*TextureManager::instance().loadTextureFromFile(ctmMesh.mTexFileName.c_str(), "texture_specular"));

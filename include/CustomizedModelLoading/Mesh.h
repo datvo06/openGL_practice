@@ -14,6 +14,9 @@ namespace DatCustom{
 		class Mesh{
 			public:
 				virtual void Draw(Shader shader) = 0;
+				virtual ~Mesh(){
+					printf("Deleting mesh...\n");
+				}
 		};
 
 

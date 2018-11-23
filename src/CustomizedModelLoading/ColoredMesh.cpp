@@ -13,28 +13,41 @@ namespace DatCustom{
 		}
 
 		ColoredMesh::ColoredMesh(CTM::Mesh& ctmMesh){
+			CTM::Vector3 aMin, aMax;
+			ctmMesh.BoundingBox(aMin, aMax);
+			printf("Min: %f, %f, %f\n", aMin.x, aMin.y, aMin.z);
+			printf("Max: %f, %f, %f\n", aMax.x, aMax.y, aMax.z);
+			float max = (aMax.x > aMax.y) ? aMax.x : aMax.y;
+			max = (max > aMax.z) ? max : aMax.z;
+			max = max/10;
 			// Let's create textured vertices
 			this->vertices.resize(ctmMesh.mVertices.size());
 			this->indices.resize(ctmMesh.mIndices.size());
 			for (size_t i = 0; i < ctmMesh.mVertices.size(); i++){
-				this->vertices[i].Position = {ctmMesh.mVertices[i].x,
-					ctmMesh.mVertices[i].y,
-					ctmMesh.mVertices[i].z
+				this->vertices[i].Position = {(ctmMesh.mVertices[i].x - aMin.x)/max,
+					(ctmMesh.mVertices[i].y - aMin.y)/max,
+					(ctmMesh.mVertices[i].z - aMin.z)/max
 				};
 				this->vertices[i].Normal = {ctmMesh.mNormals[i].x,
 					ctmMesh.mNormals[i].y,
 					ctmMesh.mNormals[i].z
 				};
-				this->vertices[i].Colors = {ctmMesh.mColors[i].x,
-					ctmMesh.mColors[i].y,
-					ctmMesh.mColors[i].z,
-					ctmMesh.mColors[i].w,
-				};
+				if (ctmMesh.HasColors()){
+					this->vertices[i].Colors = {ctmMesh.mColors[i].x,
+						ctmMesh.mColors[i].y,
+						ctmMesh.mColors[i].z,
+						ctmMesh.mColors[i].w,
+					};
+				}
+				else{
+					this->vertices[i].Colors = {0.5, 0.5, 0.5, 1.0};
+				}
 			}
 			// And Copy indices as well
 			for (size_t i = 0; i < ctmMesh.mIndices.size(); i++){
 				this->indices[i] = ctmMesh.mIndices[i];
 			}
+			printf("Indices size: %d\n", (int)this->indices.size());
 
 			setupMesh();
 		}
@@ -61,12 +74,13 @@ namespace DatCustom{
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, Normal));
 			glEnableVertexAttribArray(3);
-			glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, Colors));
+			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, Colors));
 			glBindVertexArray(0);
 		}
 
 		void ColoredMesh::Draw(Shader shader){
 			shader.setBool("hasTexture", false);
+			glDisable(GL_CULL_FACE);
 			// draw mesh
 			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
