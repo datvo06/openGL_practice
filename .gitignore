@@ -3,3 +3,7 @@ glfw/*
 *CMakeFiles*
 */build/*
 build*
+*CMakeCache*
+*compile_commands.json*
+*.cmake
+*.swp
