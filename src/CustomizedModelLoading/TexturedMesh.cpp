@@ -75,6 +75,7 @@ namespace DatCustom{
 		void TexturedMesh::Draw(Shader shader){
 			GLuint diffuseNr = 1;
 			GLuint specularNr = 1;
+			shader.setBool("hasTexture", true);
 			for (GLuint i = 0; i < textures.size(); i++){
 				glActiveTexture(GL_TEXTURE0+i); // Active proper texture uint before binding
 				// retrieve texture number ( the N in diffuse_tetureN )

@@ -55,11 +55,9 @@ namespace DatCustom{
 				/* Mesh Data */
 				std::vector<ColoredVertex> vertices;
 				std::vector<GLuint> indices;
-				std::vector<Texture> textures;
-				std::vector<glm::vec4> mColors;
 
 				/* Function */
-				ColoredMesh(std::vector<ColoredVertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures);
+				ColoredMesh(std::vector<ColoredVertex> vertices, std::vector<GLuint> indices);
 				ColoredMesh(CTM::Mesh& ctmMesh);
 				ColoredMesh();
 				void Draw(Shader shader);

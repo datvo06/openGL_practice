@@ -93,7 +93,7 @@ namespace DatCustom{
 				aiString str;
 				mat->GetTexture(type, i, &str);
 				textures.push_back(*DatCustom::Graphics::TextureManager::instance().loadTextureFromFile(
-						(directory + str.C_Str()).c_str(), typeName));
+						(directory + std::string(str.C_Str())).c_str(), typeName));
 			}
 			return textures;
 		}
