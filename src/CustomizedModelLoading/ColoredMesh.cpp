@@ -15,10 +15,14 @@ namespace DatCustom{
 		ColoredMesh::ColoredMesh(CTM::Mesh& ctmMesh){
 			CTM::Vector3 aMin, aMax;
 			ctmMesh.BoundingBox(aMin, aMax);
+			float max_x, max_y, max_z;
+			max_x = aMax.x - aMin.x;
+			max_y = aMax.y - aMin.y;
+			max_z = aMax.z - aMin.z;
 			printf("Min: %f, %f, %f\n", aMin.x, aMin.y, aMin.z);
 			printf("Max: %f, %f, %f\n", aMax.x, aMax.y, aMax.z);
-			float max = (aMax.x > aMax.y) ? aMax.x : aMax.y;
-			max = (max > aMax.z) ? max : aMax.z;
+			float max = (max_x > max_y) ? max_x : max_y;
+			max = (max > max_z) ? max : max_z;
 			max = max/10;
 			// Let's create textured vertices
 			this->vertices.resize(ctmMesh.mVertices.size());

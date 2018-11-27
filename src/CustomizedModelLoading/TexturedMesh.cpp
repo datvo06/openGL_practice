@@ -18,12 +18,24 @@ namespace DatCustom{
 
 
 		TexturedMesh::TexturedMesh(CTM::Mesh& ctmMesh){
+			CTM::Vector3 aMin, aMax;
+			ctmMesh.BoundingBox(aMin, aMax);
+			float max_x, max_y, max_z;
+			max_x = aMax.x - aMin.x;
+			max_y = aMax.y - aMin.y;
+			max_z = aMax.z - aMin.z;
+			printf("Min: %f, %f, %f\n", aMin.x, aMin.y, aMin.z);
+			printf("Max: %f, %f, %f\n", aMax.x, aMax.y, aMax.z);
+			float max = (max_x > max_y) ? max_x : max_y;
+			max = (max > max_z) ? max : max_z;
+			max = max/10;
+
 			// Let's create textured vertices
 			for (size_t i = 0; i < ctmMesh.mVertices.size(); i++){
 				this->vertices.push_back(TexturedVertex());
-				this->vertices[i].Position = {ctmMesh.mVertices[i].x,
-					ctmMesh.mVertices[i].y,
-					ctmMesh.mVertices[i].z
+				this->vertices[i].Position = {(ctmMesh.mVertices[i].x - aMin.x)/max,
+					(ctmMesh.mVertices[i].y - aMin.y)/max,
+					(ctmMesh.mVertices[i].z - aMin.z)/max
 				};
 				this->vertices[i].Normal = {ctmMesh.mNormals[i].x,
 					ctmMesh.mNormals[i].y,
