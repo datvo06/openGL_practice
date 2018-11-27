@@ -15,5 +15,5 @@ namespace DatCustom{
 	}
 }
 
-GLint TextureFromFile(const char* path, std::string directory);
+GLint TextureFromFile(const char* path);
 #endif

@@ -2,10 +2,9 @@
 using namespace std;
 
 	
-GLint TextureFromFile(const char* path, string directory){
+GLint TextureFromFile(const char* path){
 	//Generate texture ID and load texture data
 	string filepath = string(path);
-	filepath = directory + '/' + filepath;
 	int width, height, nrChannels;
 	GLuint textureID;
 	glGenTextures(1, &textureID);
