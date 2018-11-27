@@ -14,7 +14,7 @@ TextureManager& TextureManager::instance(){
 DatCustom::Graphics::TexturePtr TextureManager::loadTextureFromFile(const char* filePath, std::string typeName){
 	auto it = loadedTextures.find(filePath);
 	if (it == loadedTextures.end()){
-		GLint textureID = TextureFromFile(filePath, "");
+		GLint textureID = TextureFromFile(filePath, ".");
 		TexturePtr pTexture(new Texture());
 		pTexture->id = textureID;
 		pTexture->type = typeName;
