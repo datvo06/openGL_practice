@@ -25,7 +25,12 @@ DatCustom::Graphics::MeshPtr MeshManager::createMeshFromCTM(CTM::Mesh& ctmMesh){
 		return std::unique_ptr<glMesh>(new ColoredMesh(ctmMesh));
 	}
 	else{
-		return std::unique_ptr<glMesh>(new TexturedMesh(ctmMesh));
+		try{
+			return std::unique_ptr<glMesh>(new TexturedMesh(ctmMesh));
+		} catch (std::logic_error e){
+			printf("Warning: Failed to load texture, using default color\n");
+				return std::unique_ptr<glMesh>(new ColoredMesh(ctmMesh));
+		}
 	}
 }
 
@@ -36,6 +41,12 @@ DatCustom::Graphics::MeshPtr MeshManager::loadStaticMesh(const char* filePath){
 	std::string fileExt = UpperCase(ExtractFileExt(std::string(filePath)));
 	try{
 		CTM::ImportMesh(filePath, &ctmMesh);
+		std::string sfilePath (filePath);
+		std::string delimiter = ".";
+		std::string filename = sfilePath.substr(0, sfilePath.find(delimiter)); // token is "scott"
+		if (ctmMesh.mTexFileName == ""){
+			ctmMesh.mTexFileName = std::string(filename) + "_texture.png";
+		}
 		MeshPtr newMesh = createMeshFromCTM(ctmMesh);
 		loadedMeshFiles.insert({std::string(filePath), newMesh});
 		return newMesh;

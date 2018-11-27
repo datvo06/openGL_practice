@@ -49,6 +49,7 @@ namespace DatCustom{
 			for (size_t i = 0; i < ctmMesh.mIndices.size(); i++){
 				this->indices.push_back(ctmMesh.mIndices[i]);
 			}
+			printf("Texture File Name: %s\n", ctmMesh.mTexFileName.c_str());
 			textures.push_back(*TextureManager::instance().loadTextureFromFile(ctmMesh.mTexFileName.c_str(), "texture_diffuse"));
 			textures.push_back(*TextureManager::instance().loadTextureFromFile(ctmMesh.mTexFileName.c_str(), "texture_specular"));
 			setupMesh();
@@ -100,8 +101,10 @@ namespace DatCustom{
 				glBindTexture(GL_TEXTURE_2D, textures[i].id);
 			}
 			// draw mesh
+			glDisable(GL_CULL_FACE);
 			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+			glEnable(GL_CULL_FACE);
 			glBindVertexArray(0);
 			glActiveTexture(GL_TEXTURE0);
 		}

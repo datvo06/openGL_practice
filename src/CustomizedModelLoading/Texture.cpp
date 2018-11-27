@@ -30,7 +30,7 @@ GLint TextureFromFile(const char* path, string directory){
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
-		cout << "Failed to load texture" << endl;
+		throw std::logic_error("Failed to load texture\n");
 	}
 	// done with the image
 	stbi_image_free(data);
