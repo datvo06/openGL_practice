@@ -8,3 +8,4 @@ build*
 *.cmake
 *.swp
 *.o
+*.zip

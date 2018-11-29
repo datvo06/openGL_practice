@@ -170,7 +170,7 @@ GLuint cubeVBO;
 Shader *shaderProgram, *lampProgram, *textureBufferProgram, *cubeProgram;
 
 
-Camera theCamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
+Camera theCamera(glm::vec3(1.02, -0.76f, 4.3f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 glm::mat4 projection;
 glm::vec3 lightPos(1.7f, 1.0f, 4.0f);
@@ -392,6 +392,11 @@ void render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+
+	printf("Camera pos - dir: %f, %f ,%f - %f, %f, %f\n",
+		 	theCamera.Position.x, theCamera.Position.y, theCamera.Position.z,
+			theCamera.Front.x, theCamera.Front.y, theCamera.Front.z);
+
 
 	draw_model(theCamera);
 	draw_lamp(theCamera);
