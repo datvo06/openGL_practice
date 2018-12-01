@@ -5,7 +5,7 @@
 #include <Shader.h>
 
 
-GLfloat quadVertices[] = {
+static GLfloat quadVertices[] = {
 	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,		// top right
 	1.0f, -1.0f, 0.0f, 1.0f, 0.0f,	// bottom right
 	-1.0f, -1.0f, 0.0f,	0.0f, 0.0f,	// bottom left
@@ -13,17 +13,17 @@ GLfloat quadVertices[] = {
 };
 
 
-GLuint quadIndices[] = {
+static GLuint quadIndices[] = {
 	1, 0, 3,
 	2, 1, 3
 };
 
 
-GLuint quadVAO;
-GLuint quadVBO;
-GLuint quadEBO;
-GLuint FBO;
-GLuint RBO;
+static GLuint quadVAO;
+static GLuint quadVBO;
+static GLuint quadEBO;
+static GLuint FBO;
+static GLuint RBO;
 
 
 enum kernelTypeShader{SOBELX3, SOBELY3, SOBELXY3NORM1, MEDIAN3};
@@ -205,8 +205,8 @@ void main(){
 	}
 })glsl";
 
-Shader *pTextureRenderProgram;
-bool isGraphicsModuleInitialized = false;
+static Shader *pTextureRenderProgram;
+static bool isGraphicsModuleInitialized = false;
 
 
 void DatCustom::GraphicsImageUtil::initializeGraphicsModuleOpenGL(){
@@ -233,9 +233,9 @@ void DatCustom::GraphicsImageUtil::initializeGraphicsModuleOpenGL(){
 }
 
 
+
 unsigned int DatCustom::ConvertUtil::convertCvMat2GLTexture(cv::Mat inputMat, GLuint textureID)
 {
-	if (!isGraphicsModuleInitialized) DatCustom::GraphicsImageUtil::initializeGraphicsModuleOpenGL();
    if(inputMat.empty()){
 		 DatCustom_debug("DatCustom::ConvertUtil::CVMAT2GLTEXTURE: Image Empty!\n");
 		return 0;
@@ -321,7 +321,6 @@ void setUpFramebuffer(unsigned int width, unsigned int height, unsigned int inTe
 
 
 cv::Mat DatCustom::ConvertUtil::convertGLTexture2CvMat(unsigned int textureID, int width, int height, int nChannels){
-	if (!isGraphicsModuleInitialized) DatCustom::GraphicsImageUtil::initializeGraphicsModuleOpenGL();
 	cv::Mat output;
 	if (nChannels == 3)
 		output = cv::Mat(height, width, CV_8UC3);
@@ -337,15 +336,14 @@ cv::Mat DatCustom::ConvertUtil::convertGLTexture2CvMat(unsigned int textureID, i
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_UNSIGNED_BYTE, output.ptr());
 #else
 	setUpFramebufferForDraw(width, height, textureID, false);
-	return DatCustom::ConvertUtil::convertGLFBO2CvMat(width, height, nChannels);
+	return DatCustom::ConvertUtil::convertGLFBO2CvMat(width, height, FBO, nChannels);
 #endif
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return output;
 }
 
 
-cv::Mat DatCustom::ConvertUtil::convertGLFBO2CvMat(int width, int height, int nChannels){
-	if (!isGraphicsModuleInitialized) DatCustom::GraphicsImageUtil::initializeGraphicsModuleOpenGL();
+cv::Mat DatCustom::ConvertUtil::convertGLFBO2CvMat(int width, int height, unsigned int readFBO, int nChannels){
 	cv::Mat output;
 #if (defined(__linux__) && !defined(__ANDROID__)) || defined(__WIN32__)
 	if (nChannels == 3)
@@ -357,7 +355,7 @@ cv::Mat DatCustom::ConvertUtil::convertGLFBO2CvMat(int width, int height, int nC
 #endif
 	glPixelStorei(GL_PACK_ALIGNMENT, (output.step & 3) ? 1 : 4);
 	glPixelStorei(GL_PACK_ROW_LENGTH, output.step/output.elemSize());
-	glBindBuffer(GL_READ_FRAMEBUFFER, FBO);
+	glBindBuffer(GL_READ_FRAMEBUFFER, readFBO);
 	if (nChannels == 3){
 #if (defined(__linux__) && !defined(__ANDROID__)) || defined(__WIN32__)
 		glReadPixels(0,  0, width, height, GL_BGR, GL_UNSIGNED_BYTE, output.ptr());

@@ -24,4 +24,4 @@ target_link_libraries(datcustom ctmmesh openctm glad assimp rply)
 
 
 add_executable(hello_cubemap.exe hello_cubemap.cpp)
-target_link_libraries(hello_cubemap.exe glfw3 GL GLU X11 pthread Xrandr Xi glad dl datcustom ctmmesh openctm glad assimp tinyxml rply)
+target_link_libraries(hello_cubemap.exe glfw3 GL GLU X11 pthread Xrandr Xi glad dl datcustom ctmmesh openctm glad assimp tinyxml rply pangolin)

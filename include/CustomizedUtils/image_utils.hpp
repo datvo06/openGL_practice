@@ -13,8 +13,8 @@
 #include <opencv2/opencv.hpp>
 #endif
 
-#include <customized_utils/feature_finding.hpp>
-#include <customized_utils/feature_tracking.hpp>
+#include <CustomizedUtils/feature_finding.hpp>
+#include <CustomizedUtils/feature_tracking.hpp>
 
 namespace DatCustom {
     namespace ImUtil{

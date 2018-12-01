@@ -43,9 +43,10 @@ namespace DatCustom{
 		 * @brief converting openGL's rendered framebuffer data into openCV's matrix
 		 * @param[in] width : the width of the image
 		 * @param[in] height : the height of the image
+		 * @param[in] FBO : the framebuffer to be copied
 		 * @return openGL's textureID
 		 */
-		cv::Mat convertGLFBO2CvMat(int width, int height, int nChannels=3);
+		cv::Mat convertGLFBO2CvMat(int width, int height, unsigned int readFBO, int nChannels=3);
 
 	}
 	namespace GraphicsImageUtil{

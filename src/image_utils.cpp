@@ -6,7 +6,7 @@
 //  Copyright © 2017 Dat Nguyen Thanh. All rights reserved.
 //
 
-#include <customized_utils/image_utils.hpp>
+#include <CustomizedUtils/image_utils.hpp>
 #include <vector>
 #include <math.h>
 
