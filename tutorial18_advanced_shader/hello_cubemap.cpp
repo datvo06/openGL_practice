@@ -325,6 +325,7 @@ void init(std::string modelPath){
 	glBindVertexArray(cubeVAO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);
+	printf("Finished initializing\n");
 }
 
 
@@ -352,12 +353,20 @@ void processInput(GLFWwindow* window){
 
 void render(){
 	sumDeltaTime += nextTime - currentTime;
+	/*
 	if (sumDeltaTime >= 1.0/30){
 		cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
-		cv::imwrite((std::string("frame_") + std::to_string(gFrameCount) + ".jpg").c_str(), imout);
+		cv::imwrite((std::string("data/frame_") + std::to_string(gFrameCount) + ".jpg").c_str(), imout);
+		FILE* outCam = fopen((std::string("data/cam_") + std::to_string(gFrameCount) + ".txt").c_str(), "w");
+		fprintf(outCam, "%f %f %f\n", theCamera.Position.x, theCamera.Position.y, theCamera.Position.z);
+		fprintf(outCam, "%f %f %f\n", theCamera.Front.x, theCamera.Front.y, theCamera.Front.z);
+		fprintf(outCam, "%f %f %f\n", theCamera.Up.x, theCamera.Up.y, theCamera.Up.z);
+		fprintf(outCam, "%f %f %f\n", theCamera.Right.x, theCamera.Right.y, theCamera.Right.z);
+		fclose(outCam);
 		gFrameCount += 1;
 		sumDeltaTime = 0;
 	}
+	*/
 	currentTime = nextTime;
 	// 4. draw
 	// 4.1 Render with new framebuffer bound
