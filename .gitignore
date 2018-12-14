@@ -9,3 +9,7 @@ build*
 *.swp
 *.o
 *.zip
+*.obj
+*.mtl
+*.ply
+*tutorial*/data/*
