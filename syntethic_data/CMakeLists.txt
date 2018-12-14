@@ -11,17 +11,19 @@ include_directories("/usr/include/c++/6.4.0")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PARENT_DIR}/include)
 link_directories(${PARENT_DIR}/lib)
-
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 add_library(datcustom SHARED 
 	../src/stb_image.cpp ../src/Shader.cpp
  	../src/CustomizedModelLoading/ColoredMesh.cpp ../src/CustomizedModelLoading/MeshManager.cpp 
 	../src/CustomizedModelLoading/Model.cpp ../src/CustomizedModelLoading/Texture.cpp
 	../src/CustomizedModelLoading/TexturedMesh.cpp ../src/CustomizedModelLoading/TextureManager.cpp
-	../src/string_utils.cpp
+	../src/CustomizedUtils/GLImagesRenderer.cpp ../src/graphics_utils.cpp
+	../src/string_utils.cpp ../src/general_utils.cpp ../src/general/log.cpp
 	)
-target_link_libraries(datcustom ctmmesh openctm glad assimp rply)
+target_link_libraries(datcustom ctmmesh openctm glad assimp rply ${OpenCV_LIBS})
 
 
 add_executable(hello_cubemap.exe hello_cubemap.cpp)
-target_link_libraries(hello_cubemap.exe glfw3 GL GLU X11 pthread Xrandr Xi glad dl datcustom ctmmesh openctm glad assimp tinyxml rply pangolin)
+target_link_libraries(hello_cubemap.exe glfw3 GL GLU X11 pthread Xrandr Xi glad dl datcustom ctmmesh openctm glad assimp tinyxml rply ${OpenCV_LIBS})

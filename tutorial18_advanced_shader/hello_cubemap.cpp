@@ -353,7 +353,6 @@ void processInput(GLFWwindow* window){
 
 void render(){
 	sumDeltaTime += nextTime - currentTime;
-	/*
 	if (sumDeltaTime >= 1.0/30){
 		cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
 		cv::imwrite((std::string("data/frame_") + std::to_string(gFrameCount) + ".jpg").c_str(), imout);
@@ -366,7 +365,6 @@ void render(){
 		gFrameCount += 1;
 		sumDeltaTime = 0;
 	}
-	*/
 	currentTime = nextTime;
 	// 4. draw
 	// 4.1 Render with new framebuffer bound

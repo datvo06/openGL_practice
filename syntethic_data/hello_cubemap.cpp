@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <CustomizedModelLoading/Model.h>
+#include <CustomizedUtils/RenderToImageManager.hpp>
 
 
 #include <glm/glm.hpp>
@@ -150,11 +151,6 @@ GLuint indices[] = {
 GLuint screenWidth = 800;
 GLuint screenHeight = 600;
 
-
-GLuint FBO;
-GLuint texColorBuffer;
-GLuint RBO;
-
 GLuint quadVAO;
 GLuint quadVBO;
 GLuint quadEBO;
@@ -177,6 +173,8 @@ glm::vec3 lightPos(1.7f, 1.0f, 4.0f);
 
 float currentTime;
 float nextTime;
+float sumDeltaTime = 0.0f;
+int gFrameCount = 0;
 
 GLfloat lastX = 400, lastY = 300;
 bool firstMouse = true;
@@ -298,39 +296,8 @@ void init(std::string modelPath){
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &lampVAO);
 
-	glGenFramebuffers(1, &FBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
-	glGenTextures(1, &texColorBuffer);
-	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
- 	glTexImage2D(GL_TEXTURE_2D,	0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	/*
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	*/
-	// glBindTexture(GL_TEXTURE_2D, 0);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-
-	glGenRenderbuffers(1, &RBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-	/*
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texColorBuffer, 0);
-	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-	*/
-
-	// glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// target, attachment, textarget, texture, level
+		// target, attachment, textarget, texture, level
 	// 0. Bind VAO
 	// 1. Setup buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -358,6 +325,7 @@ void init(std::string modelPath){
 	glBindVertexArray(cubeVAO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);
+	printf("Finished initializing\n");
 }
 
 
@@ -384,10 +352,23 @@ void processInput(GLFWwindow* window){
 
 
 void render(){
+	sumDeltaTime += nextTime - currentTime;
+	if (sumDeltaTime >= 1.0/30){
+		cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
+		cv::imwrite((std::string("data/frame_") + std::to_string(gFrameCount) + ".jpg").c_str(), imout);
+		FILE* outCam = fopen((std::string("data/cam_") + std::to_string(gFrameCount) + ".txt").c_str(), "w");
+		fprintf(outCam, "%f %f %f\n", theCamera.Position.x, theCamera.Position.y, theCamera.Position.z);
+		fprintf(outCam, "%f %f %f\n", theCamera.Front.x, theCamera.Front.y, theCamera.Front.z);
+		fprintf(outCam, "%f %f %f\n", theCamera.Up.x, theCamera.Up.y, theCamera.Up.z);
+		fprintf(outCam, "%f %f %f\n", theCamera.Right.x, theCamera.Right.y, theCamera.Right.z);
+		fclose(outCam);
+		gFrameCount += 1;
+		sumDeltaTime = 0;
+	}
 	currentTime = nextTime;
 	// 4. draw
 	// 4.1 Render with new framebuffer bound
-  glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	DatCustom::Graphics::RenderToImageManager::instance().use();
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
@@ -404,7 +385,7 @@ void render(){
 	
 	// 4.2 Bind to default framebuffer
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	DatCustom::Graphics::RenderToImageManager::instance().stop();
 	draw_framebuffer();
 	// 4.3 draw quad span fullcenter with texture as bound
 	glBindVertexArray(0);
@@ -507,7 +488,7 @@ void draw_framebuffer(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	textureBufferProgram->setInt("frameTexture", 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, DatCustom::Graphics::RenderToImageManager::instance().getOutTexture());
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
