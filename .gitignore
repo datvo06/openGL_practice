@@ -13,3 +13,5 @@ build*
 *.mtl
 *.ply
 *tutorial*/data/*
+*tutorial*/*png
+*tutorial*/*jpg
