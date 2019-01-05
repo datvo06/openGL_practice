@@ -26,7 +26,7 @@ namespace DatCustom{
 
 				Eigen::MatrixXf texMean;
 				Eigen::MatrixXf texPC;
-				Eigen::MatrixXi indices;
+				Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic>  indices;
 				Eigen::MatrixXf finalShape;
 				Eigen::MatrixXf finalColor;
 
@@ -39,6 +39,15 @@ namespace DatCustom{
 				int nTextureParams;
 				void updateModelParams(const std::unordered_map<std::string, Eigen::MatrixXf>& fieldDatas = {});
 			public:
+				int getNExpParams(){
+					return nExpressionParams;
+				}
+				int getNTextureParams(){
+					return nTextureParams;
+				}
+				int getNShapeParams(){
+					return nTextureParams;
+				}
 				/** instance function
 				 * @brief update instances if 
 				 */

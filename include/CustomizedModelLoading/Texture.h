@@ -5,6 +5,8 @@
 #include <CustomizedImageLoading/stb_image.h>
 #include <assimp/scene.h>
 #include <iostream>
+#include <vector>
+#include <string>
 
 namespace DatCustom{
 	namespace Graphics{
@@ -12,8 +14,13 @@ namespace DatCustom{
 			GLuint id;
 			std::string type;
 		};
+		// faces: right, left, top, bottom, back, front
+		GLuint loadCubemap(std::vector<std::string> faces);
 	}
 }
 
 GLint TextureFromFile(const char* path);
+
+
+
 #endif

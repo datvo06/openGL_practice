@@ -3,15 +3,15 @@
 #include <Shader.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <CustomizedModelLoading/Model.h>
+#include <FaceModel/PCAFaceModel.hpp>
 #include <CustomizedUtils/RenderToImageManager.hpp>
+#include <CustomizedModelLoading/Texture.h>
 
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <Camera.h>
-#include <CustomizedModelLoading/MeshManager.hpp>
 
 
 
@@ -23,13 +23,10 @@ void draw_lamp(Camera& theCam);
 void draw_framebuffer();
 void draw_cubemap(Camera& theCam);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void init(std::string modelPath = "");
+void init();
 void render();
 void terminate();
 
-using DatCustom::Graphics::MeshPtr;
-using DatCustom::Graphics::MeshManager;
-MeshPtr pModel;
 
 GLfloat quadVertices[] = {
 	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,		// top right
@@ -44,93 +41,93 @@ GLuint quadIndices[] = {
 };
 
 GLfloat vertices[] = {
-    // positions          // normals           // texture coords
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	// positions          // normals           // texture coords
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+	0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+	0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
 GLfloat cubeVertices[] = {
-    // positions          // normals           // texture coords
-    -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-     1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-     1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-     1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-    -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-    -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	// positions          // normals           // texture coords
+	-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+	1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-    -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-     1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-     1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-     1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-    -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-    -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	-1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+	1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	-1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+	-1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-    -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-    -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-    -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-    -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-     1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-     1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-     1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-     1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-    -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-     1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-     1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-     1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-    -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-    -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+	1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+	-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-    -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-     1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-     1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-     1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-    -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-    -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+	-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+	1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+	1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+	-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
 
@@ -180,29 +177,29 @@ GLfloat lastX = 400, lastY = 300;
 bool firstMouse = true;
 
 /*
-std::vector<std::string> cubeFaces{
-	"../skyboxes/hw_alps/alps_rt.tga",
-	"../skyboxes/hw_alps/alps_lf.tga",
-	"../skyboxes/hw_alps/alps_up.jpg",
-	"../skyboxes/hw_alps/alps_dn.jpg",
-	"../skyboxes/hw_alps/alps_bk.tga",
-	"../skyboxes/hw_alps/alps_ft.tga",
-};
+	 std::vector<std::string> cubeFaces{
+	 "../skyboxes/hw_alps/alps_rt.tga",
+	 "../skyboxes/hw_alps/alps_lf.tga",
+	 "../skyboxes/hw_alps/alps_up.jpg",
+	 "../skyboxes/hw_alps/alps_dn.jpg",
+	 "../skyboxes/hw_alps/alps_bk.tga",
+	 "../skyboxes/hw_alps/alps_ft.tga",
+	 };
 
 */
 
 std::vector<std::string> cubeFaces{
 	"../skyboxes/mp_boulder/boulder-bay_rt.tga",
-	"../skyboxes/mp_boulder/boulder-bay_lf.tga",
-	"../skyboxes/mp_boulder/boulder-bay_up.jpg",
-	"../skyboxes/mp_boulder/boulder-bay_dn.jpg",
-	"../skyboxes/mp_boulder/boulder-bay_bk.tga",
-	"../skyboxes/mp_boulder/boulder-bay_ft.tga",
+		"../skyboxes/mp_boulder/boulder-bay_lf.tga",
+		"../skyboxes/mp_boulder/boulder-bay_up.jpg",
+		"../skyboxes/mp_boulder/boulder-bay_dn.jpg",
+		"../skyboxes/mp_boulder/boulder-bay_bk.tga",
+		"../skyboxes/mp_boulder/boulder-bay_ft.tga",
 };
 
 GLuint cubemapTexture;
 
-int main (int argc, char** argv)
+int main (int, char** )
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -227,7 +224,7 @@ int main (int argc, char** argv)
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
-	init(argv[1]);
+	init();
 	while(!glfwWindowShouldClose(window)){
 		nextTime = glfwGetTime();
 		// Input
@@ -243,39 +240,16 @@ int main (int argc, char** argv)
 	return 0;
 }
 
-// faces: right, left, top, bottom, back, front
-GLuint loadCubemap(std::vector<std::string> faces){
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-	int width, height, nrchannels;
-	for (unsigned int i = 0; i < faces.size(); i++){
-		stbi_set_flip_vertically_on_load(false);
-		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrchannels, 0);
-		if (data) 
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		else
-			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-		stbi_image_free(data);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	return textureID;
-}
 
-
-void init(std::string modelPath){
+void init(){
 	std::cout << "Loading model..." << std::endl;
-	pModel.reset(&*MeshManager::instance().loadStaticMesh(modelPath.c_str()));
+	DatCustom::FaceModel::PCAFaceModelManager::instance();
 	std::cout << "Loading Shader..." << std::endl;
-	cubemapTexture = loadCubemap(cubeFaces);
-	shaderProgram = new Shader("vertex.glsl", "fragment.glsl");
-	lampProgram = new Shader("vertex.glsl", "lamp_fragment.glsl");
-	textureBufferProgram = new Shader("vertex_backup.glsl", "fragment_backup.glsl");
-	cubeProgram = new Shader("vertex_cube.glsl", "fragment_cube.glsl");
+	cubemapTexture = DatCustom::Graphics::loadCubemap(cubeFaces);
+	shaderProgram = new Shader("shaders/vertex.glsl", "shaders/fragment.glsl");
+	lampProgram = new Shader("shaders/vertex.glsl", "shaders/lamp_fragment.glsl");
+	textureBufferProgram = new Shader("shaders/vertex_backup.glsl", "shaders/fragment_backup.glsl");
+	cubeProgram = new Shader("shaders/vertex_cube.glsl", "shaders/fragment_cube.glsl");
 
 	glGenVertexArrays(1, &quadVAO);
 	glGenBuffers(1, &quadVBO);
@@ -297,7 +271,7 @@ void init(std::string modelPath){
 	glGenVertexArrays(1, &lampVAO);
 
 
-		// target, attachment, textarget, texture, level
+	// target, attachment, textarget, texture, level
 	// 0. Bind VAO
 	// 1. Setup buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -329,7 +303,7 @@ void init(std::string modelPath){
 }
 
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height){
+void framebuffer_size_callback(GLFWwindow*, int width, int height){
 	screenWidth = width;
 	screenHeight = height;
 	glViewport(0, 0, width, height);
@@ -352,20 +326,31 @@ void processInput(GLFWwindow* window){
 
 
 void render(){
-	sumDeltaTime += nextTime - currentTime;
-	if (sumDeltaTime >= 1.0/30){
-		cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
-		cv::imwrite((std::string("data/frame_") + std::to_string(gFrameCount) + ".jpg").c_str(), imout);
-		FILE* outCam = fopen((std::string("data/cam_") + std::to_string(gFrameCount) + ".txt").c_str(), "w");
-		fprintf(outCam, "%f %f %f\n", theCamera.Position.x, theCamera.Position.y, theCamera.Position.z);
-		fprintf(outCam, "%f %f %f\n", theCamera.Front.x, theCamera.Front.y, theCamera.Front.z);
-		fprintf(outCam, "%f %f %f\n", theCamera.Up.x, theCamera.Up.y, theCamera.Up.z);
-		fprintf(outCam, "%f %f %f\n", theCamera.Right.x, theCamera.Right.y, theCamera.Right.z);
-		fclose(outCam);
-		gFrameCount += 1;
-		sumDeltaTime = 0;
-	}
-	currentTime = nextTime;
+	 sumDeltaTime += nextTime - currentTime;
+	 if (sumDeltaTime >= 1.0/30){
+		 /*
+	 cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
+	 cv::imwrite((std::string("data/frame_") + std::to_string(gFrameCount) + ".jpg").c_str(), imout);
+	 FILE* outCam = fopen((std::string("data/cam_") + std::to_string(gFrameCount) + ".txt").c_str(), "w");
+	 fprintf(outCam, "%f %f %f\n", theCamera.Position.x, theCamera.Position.y, theCamera.Position.z);
+	 fprintf(outCam, "%f %f %f\n", theCamera.Front.x, theCamera.Front.y, theCamera.Front.z);
+	 fprintf(outCam, "%f %f %f\n", theCamera.Up.x, theCamera.Up.y, theCamera.Up.z);
+	 fprintf(outCam, "%f %f %f\n", theCamera.Right.x, theCamera.Right.y, theCamera.Right.z);
+	 fclose(outCam);
+	 */
+		 printf("Updating..\n");
+		 DatCustom::FaceModel::PCAFaceModelManager& tempInstance = DatCustom::FaceModel::PCAFaceModelManager::instance();
+		 Eigen::VectorXf shapeParams = Eigen::VectorXf::Random(tempInstance.getNShapeParams(), 1)*10;
+		 Eigen::VectorXf exprParams = Eigen::VectorXf::Random(tempInstance.getNExpParams(), 1)/2;
+		 Eigen::VectorXf texParams = Eigen::VectorXf::Random(tempInstance.getNTextureParams(), 1);
+
+		 gFrameCount += 1;
+		 if (gFrameCount % 120 == 0){
+			 tempInstance.updateModel(shapeParams, exprParams, texParams);
+		 }
+		 sumDeltaTime = 0;
+	 }
+	 currentTime = nextTime;
 	// 4. draw
 	// 4.1 Render with new framebuffer bound
 	DatCustom::Graphics::RenderToImageManager::instance().use();
@@ -374,17 +359,19 @@ void render(){
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+	/*
 	printf("Camera pos - dir: %f, %f ,%f - %f, %f, %f\n",
-		 	theCamera.Position.x, theCamera.Position.y, theCamera.Position.z,
+			theCamera.Position.x, theCamera.Position.y, theCamera.Position.z,
 			theCamera.Front.x, theCamera.Front.y, theCamera.Front.z);
+			*/
 
 
 	draw_model(theCamera);
 	draw_lamp(theCamera);
 	draw_cubemap(theCamera);
-	
+
 	// 4.2 Bind to default framebuffer
-	
+
 	DatCustom::Graphics::RenderToImageManager::instance().stop();
 	draw_framebuffer();
 	// 4.3 draw quad span fullcenter with texture as bound
@@ -431,9 +418,9 @@ void draw_model(Camera& theCam){
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 
 	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	model = glm::scale(model, glm::vec3(0.00002f, 0.00002f, 0.00002f));	// it's a bit too big for our scene, so scale it down
 	shaderProgram->setMat4("model", glm::value_ptr(model));
-	pModel->Draw(*shaderProgram);
+	DatCustom::FaceModel::PCAFaceModelManager::instance().Draw(*shaderProgram);
 }
 
 
@@ -494,7 +481,7 @@ void draw_framebuffer(){
 }
 
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+void mouse_callback(GLFWwindow*, double xpos, double ypos){
 	if(firstMouse){
 		lastX = xpos;
 		lastY = ypos;
@@ -509,7 +496,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 }
 
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+void scroll_callback(GLFWwindow*, double, double yoffset){
 	theCamera.ProcessMouseScroll(yoffset);
 }
 
