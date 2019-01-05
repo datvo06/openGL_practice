@@ -17,3 +17,4 @@ build*
 glfw
 *tutorial*/*jpg
 *.mat
+*syntethic_data/data/*
