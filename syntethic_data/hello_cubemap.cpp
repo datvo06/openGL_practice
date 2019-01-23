@@ -136,7 +136,7 @@ glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.7f, 0.2f, 2.0f),
 	glm::vec3(2.3f, -3.3f, -4.0f),
 	glm::vec3(-4.0f, 2.0f, -12.0f),
-	glm::vec3(0.0f, 0.0f, -3.0f),
+	glm::vec3(3.0f, 0.0f, -3.0f),
 }; 
 
 
@@ -163,7 +163,7 @@ GLuint cubeVBO;
 Shader *shaderProgram, *lampProgram, *textureBufferProgram, *cubeProgram;
 
 
-Camera theCamera(glm::vec3(1.02, -0.76f, 4.3f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
+Camera theCamera(glm::vec3(0, 0, 0), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 glm::mat4 projection;
 glm::vec3 lightPos(1.7f, 1.0f, 4.0f);
@@ -422,7 +422,7 @@ void draw_model(Camera& theCam){
 	shaderProgram->setMat4("projection", glm::value_ptr(projection));
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 
-	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f)); // translate it down so it's at the center of the scene
 	model = glm::scale(model, glm::vec3(0.00001f, 0.00001f, 0.00001f));	// it's a bit too big for our scene, so scale it down
 	shaderProgram->setMat4("model", glm::value_ptr(model));
 	DatCustom::FaceModel::PCAFaceModelManager::instance().Draw(*shaderProgram);
