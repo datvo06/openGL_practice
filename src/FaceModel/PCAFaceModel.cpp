@@ -47,10 +47,12 @@ void DatCustom::FaceModel::PCAFaceModelManager::recalculateNormals(){
 				b = finalShape.block<3, 1>(3*indices(1, i), 0),
 				c = finalShape.block<3, 1>(3*indices(2, i), 0);
 		Eigen::Vector3f tempNorm = (b-a).cross(c-a);
-		tempNorm.normalize();
 		normals.col(indices(0, i)) += Eigen::VectorXf(tempNorm);
 		normals.col(indices(1, i)) += Eigen::VectorXf(tempNorm);
 		normals.col(indices(2, i)) += Eigen::VectorXf(tempNorm);
+	}
+	for (int i = 0; i < normals.cols(); i++){
+		normals.col(i).normalize();
 	}
 	// normals = normals.array().rowwise()/counts.array().transpose();
 }
@@ -63,17 +65,20 @@ void DatCustom::FaceModel::PCAFaceModelManager::updateModel(const Eigen::VectorX
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	printf("Here 2: %d, %d\n", (int)shapeParams.size(), (int)expressionParams.size());
 	if (shapeParams.size() != 0 || expressionParams.size() != 0) {
 		finalShape = shapeMean;
 		//using eigen broadcasting here...
 		if (shapeParams.size() != 0) {
-			lastIdentity = (shapePC.array().rowwise() * shapeParams.array().transpose()).rowwise().sum();
+			Eigen::ArrayXf weightedShapeParams = shapeEV.array()*shapeParams.array();
+			lastIdentity = (shapePC.array().rowwise()*weightedShapeParams.transpose()).rowwise().sum();
 		}
 		finalShape += lastIdentity;
 
 		if (expressionParams.size() != 0) {
-			lastExpr = (expPC.array().rowwise() * expressionParams.array().transpose()).rowwise().sum();
+			Eigen::ArrayXf weightedExpressionParams = expEV.array()*expressionParams.array();
+			lastExpr = (expPC.array().rowwise() * weightedExpressionParams.transpose()).rowwise().sum();
+			lastExpr += expMean;
+			// lastExpr = (expPC.array().rowwise() * expressionParams.array().transpose()).rowwise().sum();
 		}
 		finalShape += lastExpr;
 		glBufferSubData(GL_ARRAY_BUFFER, 0, this->shapeMean.size()* sizeof(float), &finalShape(0));
@@ -83,8 +88,9 @@ void DatCustom::FaceModel::PCAFaceModelManager::updateModel(const Eigen::VectorX
 			 	this->normals.size()* sizeof(float), &normals(0));
 	}
 	if (textureParams.size() != 0){
-		lastColor = (texPC.array().rowwise()*textureParams.array().transpose()).rowwise().sum();
-		finalColor = (texMean + lastColor)/100.0;
+		Eigen::ArrayXf weightedColorParams = texEV.array()*textureParams.array();
+		lastColor = (texPC.array().rowwise()*weightedColorParams.transpose()).rowwise().sum();
+		finalColor = (texMean + lastColor)/127.0;
 		glBufferSubData(GL_ARRAY_BUFFER, this->shapeMean.size()* sizeof(float)*2, this->texMean.size()*sizeof(float),
 			&finalColor(0));
 	}
@@ -141,16 +147,19 @@ void DatCustom::FaceModel::PCAFaceModelManager::updateModelParams(
 	// Params to generate a morphable model
 	this->shapeMean = fieldDatas.at("shapeMU");
 	this->shapePC = fieldDatas.at("shapePC");
+	this->shapeEV = fieldDatas.at("shapeEV");
 
 	this->expMean = fieldDatas.at("expMU");
 	this->expPC = fieldDatas.at("expPC");
+	this->expEV = fieldDatas.at("expEV");
 	
 	this->texMean = fieldDatas.at("texMU");
 	this->texPC = fieldDatas.at("texPC");
+	this->texEV = fieldDatas.at("texEV");
 
 	// Final for render, setup for initial mesh setup
 	this->finalShape = this->shapeMean;
-	this->finalColor = this->texMean/100.0;
+	this->finalColor = this->texMean/127.0;
 	this->normals = Eigen::MatrixXf::Zero(3, (int)shapePC.size()/3);
 	this->lastExpr = Eigen::MatrixXf::Zero(shapeMean.rows(), shapeMean.cols()); 
 	this->lastIdentity = Eigen::MatrixXf::Zero(expMean.rows(), expMean.cols()); 

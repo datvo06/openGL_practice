@@ -18,14 +18,18 @@ namespace DatCustom{
 				void setupMesh();
 				void recalculateNormals();
 				Eigen::MatrixXf normals;
+
 				Eigen::MatrixXf shapeMean;
 				Eigen::MatrixXf shapePC;
+				Eigen::MatrixXf shapeEV;
 
 				Eigen::MatrixXf expMean;
 				Eigen::MatrixXf expPC;
+				Eigen::MatrixXf expEV;
 
 				Eigen::MatrixXf texMean;
 				Eigen::MatrixXf texPC;
+				Eigen::MatrixXf texEV;
 				Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic>  indices;
 				Eigen::MatrixXf finalShape;
 				Eigen::MatrixXf finalColor;
