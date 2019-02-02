@@ -26,6 +26,9 @@ namespace DatCustom{
 				virtual GLuint getVAO() = 0;
 				virtual GLuint getVBO() = 0;
 				virtual GLuint getEBO() = 0;
+				virtual ~glMesh(){
+					printf("Deleting glMesh...\n");
+				}
 		};
 
 		class TexturedMesh: public glMesh{
@@ -45,6 +48,7 @@ namespace DatCustom{
 				virtual GLuint getVAO() { return VAO; };
 				virtual GLuint getVBO() { return VBO; };
 				virtual GLuint getEBO() { return EBO; };
+				virtual ~TexturedMesh();
 			private:
 				/* Render Data */
 				GLuint VAO, VBO, EBO;
@@ -67,6 +71,7 @@ namespace DatCustom{
 				virtual GLuint getVAO() {return VAO;}
 				virtual GLuint getVBO() {return VBO;}
 				virtual GLuint getEBO() {return EBO;}
+				virtual ~ColoredMesh();
 			private:
 				/* Render Data */
 				GLuint VAO, VBO, EBO;

@@ -5,6 +5,12 @@ namespace DatCustom{
 	namespace Graphics{
 		ColoredMesh::ColoredMesh(){
 		}
+		ColoredMesh::~ColoredMesh(){
+			printf("Delete Here 0\n");
+			glDeleteBuffers(1, &VBO);
+			glDeleteBuffers(1, &EBO);
+			glDeleteVertexArrays(1, &VAO);
+		}
 
 		ColoredMesh::ColoredMesh(std::vector<ColoredVertex> vertices, std::vector<GLuint> indices){
 			this->vertices = vertices;
@@ -57,10 +63,12 @@ namespace DatCustom{
 		}
 		void ColoredMesh::setupMesh()
 		{
+			printf("Gen Here 0\n");
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
 
+			printf("Gen Here 1\n");
 			glBindVertexArray(VAO);
 
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -71,6 +79,7 @@ namespace DatCustom{
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
 					&indices[0], GL_STATIC_DRAW);
 
+			printf("Gen Here 2\n");
 			// vertex positions
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (void*)0);
@@ -79,6 +88,7 @@ namespace DatCustom{
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, Normal));
 			glEnableVertexAttribArray(3);
 			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, Colors));
+			printf("Gen Here 3\n");
 			glBindVertexArray(0);
 		}
 

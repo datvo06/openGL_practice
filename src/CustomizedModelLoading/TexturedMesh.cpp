@@ -15,6 +15,13 @@ namespace DatCustom{
 
 		TexturedMesh::TexturedMesh(){
 		}
+		TexturedMesh::~TexturedMesh(){
+			glDeleteBuffers(1, &EBO);
+			glDeleteBuffers(1, &VBO);
+			for (auto texture: textures)
+				glDeleteTextures(1, &texture.id);
+			glDeleteVertexArrays(1, &VAO);
+		}
 
 
 		TexturedMesh::TexturedMesh(CTM::Mesh& ctmMesh){

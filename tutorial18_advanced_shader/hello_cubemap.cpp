@@ -166,7 +166,7 @@ GLuint cubeVBO;
 Shader *shaderProgram, *lampProgram, *textureBufferProgram, *cubeProgram;
 
 
-Camera theCamera(glm::vec3(1.02, -0.76f, 4.3f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
+Camera theCamera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 glm::mat4 projection;
 glm::vec3 lightPos(1.7f, 1.0f, 4.0f);
@@ -430,8 +430,10 @@ void draw_model(Camera& theCam){
 	shaderProgram->setMat4("projection", glm::value_ptr(projection));
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 
-	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+	model = glm::rotate(model, glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+	model = glm::rotate(model, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));	// it's a bit too big for our scene, so scale it down
 	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	model = glm::translate(model, glm::vec3(-4.0f, -5.0f, 13.0f)); // translate it down so it's at the center of the scene
 	shaderProgram->setMat4("model", glm::value_ptr(model));
 	pModel->Draw(*shaderProgram);
 }

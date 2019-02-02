@@ -3,8 +3,8 @@
 #include <Shader.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <FaceModel/PCAFaceModel.hpp>
 #include <CustomizedUtils/RenderToImageManager.hpp>
+#include <CustomizedModelLoading/MeshManager.hpp>
 #include <CustomizedModelLoading/Texture.h>
 
 
@@ -14,6 +14,8 @@
 #include <Camera.h>
 
 
+using DatCustom::Graphics::MeshManager;
+using DatCustom::Graphics::MeshPtr;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -27,6 +29,7 @@ void init();
 void render();
 void terminate();
 
+MeshPtr theMesh;
 
 GLfloat quadVertices[] = {
 	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,		// top right
@@ -172,6 +175,7 @@ float currentTime;
 float nextTime;
 float sumDeltaTime = 0.0f;
 int gFrameCount = 0;
+int totalFrame = 0;
 
 GLfloat lastX = 400, lastY = 300;
 bool firstMouse = true;
@@ -242,9 +246,9 @@ int main (int, char** )
 
 
 void init(){
-	std::cout << "Loading model..." << std::endl;
-	DatCustom::FaceModel::PCAFaceModelManager::instance();
+	theMesh = MeshManager::instance().loadStaticMesh("1.obj");
 	std::cout << "Loading Shader..." << std::endl;
+	// Let's get the total number of frames... for now
 	cubemapTexture = DatCustom::Graphics::loadCubemap(cubeFaces);
 	shaderProgram = new Shader("shaders/vertex.glsl", "shaders/fragment.glsl");
 	lampProgram = new Shader("shaders/vertex.glsl", "shaders/lamp_fragment.glsl");
@@ -324,9 +328,17 @@ void processInput(GLFWwindow* window){
 		theCamera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
+int gTempModelCount = 1;
+
 
 void render(){
 	 sumDeltaTime += nextTime - currentTime;
+	 // Let's load the ith model
+		printf("Here0\n");
+
+	 theMesh.reset(&*MeshManager::instance().loadStaticMesh(("flame_objs/" + std::to_string((gTempModelCount-1)%1000+1) + "_0.obj").c_str()));
+	 printf("Current Temp Model Count: %d\n", gTempModelCount);
+	 printf("Here1\n");
 	 if (sumDeltaTime >= 1.0/30){
 		 /*
 	 cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
@@ -338,6 +350,7 @@ void render(){
 	 fprintf(outCam, "%f %f %f\n", theCamera.Right.x, theCamera.Right.y, theCamera.Right.z);
 	 fclose(outCam);
 	 */
+		 /*
 		 printf("Updating..\n");
 		 DatCustom::FaceModel::PCAFaceModelManager& tempInstance = DatCustom::FaceModel::PCAFaceModelManager::instance();
 		 // Gen vectors in range 0, 1
@@ -353,6 +366,7 @@ void render(){
 		 if (gFrameCount % 120 == 0){
 			 tempInstance.updateModel(shapeParams, exprParams, texParams);
 		 }
+		 */
 		 sumDeltaTime = 0;
 	 }
 	 currentTime = nextTime;
@@ -370,8 +384,9 @@ void render(){
 			theCamera.Front.x, theCamera.Front.y, theCamera.Front.z);
 			*/
 
-
+	printf("Here1\n");
 	draw_model(theCamera);
+	printf("Here2\n");
 	draw_lamp(theCamera);
 	draw_cubemap(theCamera);
 
@@ -381,6 +396,12 @@ void render(){
 	draw_framebuffer();
 	// 4.3 draw quad span fullcenter with texture as bound
 	glBindVertexArray(0);
+
+	printf("Here3\n");
+	cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
+	printf("Here4\n");
+	cv::imwrite((std::string("data/frame_") + std::to_string((gTempModelCount-1)%1000+1) + ".jpg").c_str(), imout);
+	 gTempModelCount += 1;
 }
 
 void draw_model(Camera& theCam){
@@ -422,10 +443,20 @@ void draw_model(Camera& theCam){
 	shaderProgram->setMat4("projection", glm::value_ptr(projection));
 	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f)); // translate it down so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(0.00001f, 0.00001f, 0.00001f));	// it's a bit too big for our scene, so scale it down
+	/*
+	model = glm::rotate(model, glm::pi<float>()*3/2, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	model = glm::translate(model, glm::vec3(-5.0f, -5.0f, -20.0f)); // translate it down so it's at the center of the scene
+	*/
+	model = glm::rotate(model, glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+	model = glm::rotate(model, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));	// it's a bit too big for our scene, so scale it down
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	model = glm::translate(model, glm::vec3(-2.0f, -4.0f, 13.0f)); // translate it down so it's at the center of the scene
+
+	// model = glm::rotate(model, glm::pi<float>()/6, glm::vec3(0.0f, 1.0f, 0.0f));
 	shaderProgram->setMat4("model", glm::value_ptr(model));
-	DatCustom::FaceModel::PCAFaceModelManager::instance().Draw(*shaderProgram);
+	// DatCustom::FaceModel::PCAFaceModelManager::instance().Draw(*shaderProgram);
+	theMesh->Draw(*shaderProgram);
 }
 
 
