@@ -345,7 +345,7 @@ void render(){
 		 Eigen::VectorXf shapeParams = (Eigen::VectorXf::Random(tempInstance.getNShapeParams(), 1) + Eigen::VectorXf::Constant(tempInstance.getNShapeParams(), 1, 1.));
 		 // Eigen::VectorXf exprParams = (Eigen::VectorXf::Random(tempInstance.getNExpParams(), 1) + Eigen::VectorXf::Constant(tempInstance.getNExpParams(), 1, 1.))/1.25;
 		 srand((unsigned int) time(0));
-		 Eigen::VectorXf exprParams = (Eigen::VectorXf::Random(tempInstance.getNExpParams(), 1) + Eigen::VectorXf::Constant(tempInstance.getNExpParams(), 1, 1.))/80;
+		 Eigen::VectorXf exprParams = ((Eigen::VectorXf::Random(tempInstance.getNExpParams(), 1) + Eigen::VectorXf::Constant(tempInstance.getNExpParams(), 1, 1.))*1.5 - 1.5*Eigen::VectorXf::Constant(tempInstance.getNExpParams(), 1, 1.))/80;
 		 srand((unsigned int) time(0));
 		 Eigen::VectorXf texParams = (Eigen::VectorXf::Random(tempInstance.getNTextureParams(), 1) + Eigen::VectorXf::Constant(tempInstance.getNTextureParams(), 1, 1.));
 
