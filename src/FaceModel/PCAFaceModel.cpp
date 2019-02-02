@@ -69,14 +69,20 @@ void DatCustom::FaceModel::PCAFaceModelManager::updateModel(const Eigen::VectorX
 		finalShape = shapeMean;
 		//using eigen broadcasting here...
 		if (shapeParams.size() != 0) {
+			/*
 			Eigen::ArrayXf weightedShapeParams = shapeEV.array()*shapeParams.array();
 			lastIdentity = (shapePC.array().rowwise()*weightedShapeParams.transpose()).rowwise().sum();
+			*/
+			lastIdentity = shapePC*shapeParams;
 		}
 		finalShape += lastIdentity;
 
 		if (expressionParams.size() != 0) {
+			/*
 			Eigen::ArrayXf weightedExpressionParams = expEV.array()*expressionParams.array();
 			lastExpr = (expPC.array().rowwise() * weightedExpressionParams.transpose()).rowwise().sum();
+			*/
+			lastExpr = expPC * expressionParams;
 			lastExpr += expMean;
 			// lastExpr = (expPC.array().rowwise() * expressionParams.array().transpose()).rowwise().sum();
 		}
@@ -88,8 +94,10 @@ void DatCustom::FaceModel::PCAFaceModelManager::updateModel(const Eigen::VectorX
 			 	this->normals.size()* sizeof(float), &normals(0));
 	}
 	if (textureParams.size() != 0){
+		/*
 		Eigen::ArrayXf weightedColorParams = texEV.array()*textureParams.array();
-		lastColor = (texPC.array().rowwise()*weightedColorParams.transpose()).rowwise().sum();
+		*/
+		lastColor = texPC*textureParams;
 		finalColor = (texMean + lastColor)/127.0;
 		glBufferSubData(GL_ARRAY_BUFFER, this->shapeMean.size()* sizeof(float)*2, this->texMean.size()*sizeof(float),
 			&finalColor(0));
