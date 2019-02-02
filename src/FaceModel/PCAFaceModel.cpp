@@ -142,7 +142,12 @@ void DatCustom::FaceModel::PCAFaceModelManager::updateModelParams(
 	if (fieldDatas.size() == 0)
 		return;
 	// indices for EBO, will be constant throught out the program
-	this->indices = fieldDatas.at("tri").cast<unsigned int>();
+	this->indices = Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic>(
+			fieldDatas.at("tri").rows()+fieldDatas.at("tri_mouth").rows(),
+		 fieldDatas.at("tri").cols());
+	// VStack
+	this->indices << fieldDatas.at("tri").cast<unsigned int>(),
+	 	fieldDatas.at("tri_mouth").cast<unsigned int>(); // <-- syntax is the same for vertical and horizontal concatenation
 	this->indices -= Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic>::Ones(this->indices.rows(), this->indices.cols());
 	// Params to generate a morphable model
 	this->shapeMean = fieldDatas.at("shapeMU");
