@@ -1,6 +1,8 @@
 GLFW:
 git clone https://github.com/glfw/glfw && mkdir build && cd build && cmake ../glfw && make -j4 && sudo make install
 Get on Glad opengl and download the zip file
-ask Dat for libdatstringutils.so
+Install eigen
+Build hdf5 and matio following the instruction on matio site, (remember to enable mat73)
+Install OpenCTM (in the repo)
 build assimp
 Replace your library in the lib folder
