@@ -23,7 +23,7 @@ add_library(datcustom SHARED
 	../src/CustomizedModelLoading/TexturedMesh.cpp ../src/CustomizedModelLoading/TextureManager.cpp
 	../src/CustomizedUtils/GLImagesRenderer.cpp ../src/graphics_utils.cpp
 	../src/string_utils.cpp ../src/general_utils.cpp ../src/general/log.cpp
-	../src/FaceModel/PCAFaceModel.cpp
+	../src/FaceModel/PCAFaceModel.cpp ../src/FileUtils.cpp
 	)
 target_link_libraries(datcustom ctmmesh openctm glad assimp rply ${OpenCV_LIBS})
 
