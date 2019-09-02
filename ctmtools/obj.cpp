@@ -141,6 +141,42 @@ static CTM::Vector3 ParseVector3(const string aString)
   return result;
 }
 
+
+static std::pair<CTM::Vector3, CTM::Vector3> ParseTwoVector3(const string aString){
+	CTM::Vector3 result1;
+	CTM::Vector3 result2;
+  istringstream sstr(aString);
+  sstr >> result1.x;
+  sstr >> result1.y;
+  sstr >> result1.z;
+
+	sstr >> result2.x;
+  sstr >> result2.y;
+  sstr >> result2.z;
+
+  return std::make_pair(result1, result2);
+
+}
+
+
+static std::vector<float> ParseToFloats(const string aString){
+	std::string tempString = aString;
+	std::vector<float> floatList;
+	std::string delimiter = " ";
+
+	size_t pos = 0;
+	std::string token;
+	while ((pos = tempString.find(delimiter)) != std::string::npos) {
+			token = tempString.substr(0, pos);
+			floatList.push_back(std::strtof(token.c_str(), NULL));
+			tempString.erase(0, pos + delimiter.length());
+	}
+	return floatList;
+}
+
+enum MeshType {TEXTURE_ONLY, COLOR_ONLY_INTEGER, COLOR_ONLY_FLOAT};
+
+
 /// Import a mesh from an OBJ file.
 void CTM::Import_OBJ(const char * aFileName, Mesh * aMesh)
 {
@@ -153,11 +189,16 @@ void CTM::Import_OBJ(const char * aFileName, Mesh * aMesh)
     throw runtime_error("Could not open input file.");
 
   // Mesh description - parsed from the OBJ file
+
+	// Let's  modify a little bit and add colors
   list<Vector3> vertices;
+  list<Vector3> colors;
   list<Vector2> texCoords;
   list<Vector3> normals;
   list<OBJFace> faces;
 
+	bool isDetermined = false;
+	MeshType meshType = TEXTURE_ONLY;
   // Parse the file
   while(!inFile.eof())
   {
@@ -174,8 +215,43 @@ void CTM::Import_OBJ(const char * aFileName, Mesh * aMesh)
     // Parse the line, if it is non-empty
     if(line.size() >= 1)
     {
-      if(line.substr(0, 2) == string("v "))
-        vertices.push_back(ParseVector3(line.substr(2)));
+      if(line.substr(0, 2) == string("v ")){
+				if (!isDetermined){
+					std::vector<float> floatList = ParseToFloats(line.substr(2));
+					if (floatList.size() == 3){
+						meshType = TEXTURE_ONLY;
+					}
+					else{
+						if (std::max(std::max(floatList[3], floatList[4]), floatList[5]) > 1.0)
+							meshType = COLOR_ONLY_INTEGER;
+						else {
+							meshType = COLOR_ONLY_FLOAT;
+						}
+					}
+					isDetermined = true;
+				}
+				if (meshType == COLOR_ONLY_INTEGER || meshType == COLOR_ONLY_FLOAT){
+						std::pair<CTM::Vector3, CTM::Vector3> vercor = ParseTwoVector3(line.substr(2)); 
+						if (meshType == COLOR_ONLY_INTEGER){
+							CTM::Vector4 color;
+							color.x = vercor.second.x/255.0f;
+							color.y = vercor.second.y/255.0f;
+							color.z = vercor.second.z/255.0f;
+							color.w = 1.0f;
+							aMesh->mColors.push_back(color);
+						}
+						else{
+							CTM::Vector4 color;
+							color.x = vercor.second.x;
+							color.y = vercor.second.y;
+							color.z = vercor.second.z;
+							color.w = 1.0f;
+							aMesh->mColors.push_back(color);
+						}
+						vertices.push_back(vercor.first);
+				}
+				else vertices.push_back(ParseVector3(line.substr(2)));
+			}
       else if(line.substr(0, 3) == string("vt "))
         texCoords.push_back(ParseVector2(line.substr(3)));
       else if(line.substr(0, 3) == string("vn "))

@@ -8,9 +8,10 @@ AR = ar rcs
 CPPFLAGS = -Wall -Wno-unknown-pragmas -Wno-format -O3 -fPIC -shared
 
 # Target files
-STATICLIB = libtinyxml.so
+STATICLIB = libtinyxml.a
+DYNAMICLIB = libtinyxml.so
 
-all: $(STATICLIB)
+all: $(STATICLIB) $(DYNAMICLIB)
 
 # Object files
 OBJS = tinyxml.o \
@@ -21,6 +22,9 @@ OBJS = tinyxml.o \
 # Rule for static library
 $(STATICLIB): $(OBJS)
 	$(AR) $@ $(OBJS)
+
+$(DYNAMICLIB): $(OBJS)
+	$(CPP) $(OBJS) -fPIC -shared -o $@
 
 # Compile rules
 %.o : %.cpp
