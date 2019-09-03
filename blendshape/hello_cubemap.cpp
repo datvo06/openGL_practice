@@ -163,7 +163,7 @@ GLuint EBO;
 GLuint cubeVAO;
 GLuint cubeVBO;
 
-Shader *shaderProgram, *lampProgram, *textureBufferProgram, *cubeProgram;
+Shader *blendShapeShaderProgram, *modelShaderProgram, *lampProgram, *textureBufferProgram, *cubeProgram;
 
 
 // The original config
@@ -252,7 +252,8 @@ void init(){
 	std::cout << "Loading Shader..." << std::endl;
 	// Let's get the total number of frames... for now
 	cubemapTexture = DatCustom::Graphics::loadCubemap(cubeFaces);
-	shaderProgram = new Shader("shaders/vertex.glsl", "shaders/fragment.glsl");
+	modelShaderProgram = new Shader("shaders/vertex.glsl", "shaders/fragment.glsl");
+	blendShapeShaderProgram = new Shader("shaders/vertex_color_blendshape.glsl", "shaders/fragment.glsl");
 	lampProgram = new Shader("shaders/vertex.glsl", "shaders/lamp_fragment.glsl");
 	textureBufferProgram = new Shader("shaders/vertex_backup.glsl", "shaders/fragment_backup.glsl");
 	cubeProgram = new Shader("shaders/vertex_cube.glsl", "shaders/fragment_cube.glsl");
