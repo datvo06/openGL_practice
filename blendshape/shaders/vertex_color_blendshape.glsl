@@ -21,13 +21,24 @@ uniform mat4 projection;
 uniform vec3 lightPos;
 
 uniform int nBlendShape;
-uniform int weights[5];
+uniform float weights[5];
 uniform bool hasTexture = false;
 
-vec3 posArray[] = [aPos0, aPos1, aPos2, aPos3, aPos4];
-vec4 colorArray[] = [aColor0, aColor1, aColor2, aColor3, aColor4];
-vec3 normalArray[] = [aNormal0, aNormal1, aNormal2, aNormal3, aNormal4];
+vec3 posArray[] = vec3[5](aPos0, aPos1, aPos2, aPos3, aPos4);
+vec4 colorArray[] = vec4[5](aColor0, aColor1, aColor2, aColor3, aColor4);
+vec3 normalArray[] = vec3[5](aNormal0, aNormal1, aNormal2, aNormal3, aNormal4);
 
+/*
+vec3 posArray[] = vec3[5](
+			vec3(0.0, 0.0, 0.0),
+			vec3(0.0, 0.0, 0.0),
+			vec3(0.0, 0.0, 0.0),
+			vec3(0.0, 0.0, 0.0),
+			vec3(0.0, 0.0, 0.0));
+*/
+
+
+out vec2 texCoord;
 out vec3 Normal;
 out vec3 FragPos;
 out vec4 vertexColor;
@@ -44,19 +55,24 @@ void main (){
 	}
 	*/
 	// The positions are just sumarization of the weighted
+
 	vec3 aPos = vec3(0.0, 0.0, 0.0);
 	vec3 aNormal = vec3(0.0, 0.0, 0.0);
-	vec4 aColor = vec3(0.0, 0.0, 0.0);
+	vec4 aColor = vec4(vec3(0.0, 0.0, 0.0), 1.0);
 	for (int i = 0; i < nBlendShape; i++){
 		aPos += posArray[i]*weights[i];
 		aColor += colorArray[i]*weights[i];
 		aNormal += mat3(transpose(inverse(model))) * normalArray[i]*weights[i];
 	}
+	// aPos = aPos4;
+	// aNormal = aNormal4;
+	// aColor = aColor4;
+
 	// Normal will be normalized in the next step so no need to do it now..
 
 	FragPos = vec3(model * vec4(aPos, 1.0));
 	gl_Position = projection * view * vec4(FragPos, 1.0);
 	Normal = aNormal;
-	texCoord = aTexCoord;
 	vertexColor = aColor;
+	texCoord = vec2(0.0, 0.0);
 }

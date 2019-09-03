@@ -19,7 +19,7 @@ namespace DatCustom{
 				MeshManager& operator=(const MeshManager& rhs);
 			public:
 				MeshPtr loadStaticMesh(const char* filePath);
-				BlendShapeMeshPtr loadStaticBlendShape(const char** filePaths, int numBlendShape);
+				BlendShapeMeshPtr loadStaticBlendShape(std::vector<std::string> filePaths);
 				static MeshManager& instance();
 		};
 	}

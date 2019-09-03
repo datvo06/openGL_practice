@@ -7,7 +7,7 @@
 #include <CustomizedModelLoading/MeshManager.hpp>
 #include <CustomizedModelLoading/Texture.h>
 
-
+#include <eigen3/Eigen/Eigen>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,6 +16,7 @@
 
 using DatCustom::Graphics::MeshManager;
 using DatCustom::Graphics::MeshPtr;
+using DatCustom::Graphics::BlendShapeMeshPtr;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -29,7 +30,10 @@ void init();
 void render();
 void terminate();
 
-MeshPtr theMesh;
+BlendShapeMeshPtr theBlendShape;
+
+std::vector<unsigned int> blendShapeindices = {0, 1, 2, 3, 4};
+std::vector<float> weights = {0.2, 0.2, 0.2, 0.2, 0.2};
 
 GLfloat quadVertices[] = {
 	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,		// top right
@@ -248,7 +252,9 @@ int main (int, char** )
 
 
 void init(){
-	theMesh = MeshManager::instance().loadStaticMesh("1.obj");
+	std::cout << "Loading BlendShape..." << std::endl;
+	// Loading blendshape
+	theBlendShape = MeshManager::instance().loadStaticBlendShape({"0.obj", "1.obj", "2.obj", "3.obj", "4.obj"});
 	std::cout << "Loading Shader..." << std::endl;
 	// Let's get the total number of frames... for now
 	cubemapTexture = DatCustom::Graphics::loadCubemap(cubeFaces);
@@ -339,10 +345,13 @@ void render(){
 	 // Let's load the ith model
 		//printf("Here0\n");
 
-	 theMesh.reset(&*MeshManager::instance().loadStaticMesh(("flame_objs_with_colors_nick/" + std::to_string((gTempModelCount-1)%1000+1) + "_0.obj").c_str()));
-	 printf("Current Temp Model Count: %d\n", gTempModelCount);
+	 // printf("Current Temp Model Count: %d\n", gTempModelCount);
 	 // printf("Here1\n");
 	 if (sumDeltaTime >= 1.0/30){
+		 // reset the weights;
+		 Eigen::VectorXf newWeights = Eigen::VectorXf::Random(5).array().abs();
+		 newWeights /= newWeights.sum();
+		 // weights.assign(newWeights.data(), newWeights.data() + newWeights.size());
 		 /*
 	 cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
 	 cv::imwrite((std::string("data/frame_") + std::to_string(gFrameCount) + ".jpg").c_str(), imout);
@@ -388,7 +397,9 @@ void render(){
 			*/
 
 	// printf("Here1\n");
+	glDisable(GL_CULL_FACE);
 	draw_model(theCamera);
+	glEnable(GL_CULL_FACE);
 	// printf("Here2\n");
 	draw_lamp(theCamera);
 	draw_cubemap(theCamera);
@@ -408,9 +419,9 @@ void render(){
 }
 
 void draw_model(Camera& theCam){
-	shaderProgram->use();
+	blendShapeShaderProgram->use();
 	// shaderProgram->setFloat("material.shininess", 32.0f);
-	shaderProgram->setFloat("material.shininess", 16.0f);
+	blendShapeShaderProgram->setFloat("material.shininess", 16.0f);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 
 	glm::vec3 lightColor;
@@ -421,21 +432,21 @@ void draw_model(Camera& theCam){
 	glm::vec3 diffuseColor = lightColor * glm::vec3(0.2f); // 0.5
 	glm::vec3 ambientColor = diffuseColor * glm::vec3(0.0f); //0.2
 	glm::vec3 lightDir(0.0f, -1.0f, -2.0f);
-	shaderProgram->setVec3("dirlight.direction", glm::value_ptr(lightDir));
-	shaderProgram->setVec3("dirlight.ambient", glm::value_ptr(ambientColor));
-	shaderProgram->setVec3("dirlight.diffuse", glm::value_ptr(diffuseColor));
-	shaderProgram->setVec3("dirlight.specular", 1.0f, 1.0f, 1.0f);
+	blendShapeShaderProgram->setVec3("dirlight.direction", glm::value_ptr(lightDir));
+	blendShapeShaderProgram->setVec3("dirlight.ambient", glm::value_ptr(ambientColor));
+	blendShapeShaderProgram->setVec3("dirlight.diffuse", glm::value_ptr(diffuseColor));
+	blendShapeShaderProgram->setVec3("dirlight.specular", 1.0f, 1.0f, 1.0f);
 
 	for (int i = 0; i < 4; i++){
 		std::string pointString = "pointLights";
 		pointString  += "[" + std::to_string(i)+ "].";
-		shaderProgram->setVec3((pointString+"position"), glm::value_ptr(pointLightPositions[i]));
-		shaderProgram->setVec3((pointString+"ambient"), glm::value_ptr(ambientColor));
-		shaderProgram->setVec3((pointString+"diffuse"), glm::value_ptr(diffuseColor));
-		shaderProgram->setVec3((pointString+"specular"), 1.0f, 1.0f, 1.0f);
-		shaderProgram->setFloat((pointString+"constant"), 1.0f);
-		shaderProgram->setFloat((pointString+"linear"), 0.09f);
-		shaderProgram->setFloat((pointString+"quadratic"), 0.032f);
+		blendShapeShaderProgram->setVec3((pointString+"position"), glm::value_ptr(pointLightPositions[i]));
+		blendShapeShaderProgram->setVec3((pointString+"ambient"), glm::value_ptr(ambientColor));
+		blendShapeShaderProgram->setVec3((pointString+"diffuse"), glm::value_ptr(diffuseColor));
+		blendShapeShaderProgram->setVec3((pointString+"specular"), 1.0f, 1.0f, 1.0f);
+		blendShapeShaderProgram->setFloat((pointString+"constant"), 1.0f);
+		blendShapeShaderProgram->setFloat((pointString+"linear"), 0.09f);
+		blendShapeShaderProgram->setFloat((pointString+"quadratic"), 0.032f);
 	}
 	
 	glm::mat4 model;
@@ -443,34 +454,34 @@ void draw_model(Camera& theCam){
 	// pos, target, up
 	
 	projection = glm::perspective(glm::radians(theCam.Zoom), (float)screenWidth/screenHeight, 0.1f, 100.0f);
-	shaderProgram->setMat4("view", glm::value_ptr(view));
-	shaderProgram->setMat4("projection", glm::value_ptr(projection));
-	shaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
+	blendShapeShaderProgram->setMat4("view", glm::value_ptr(view));
+	blendShapeShaderProgram->setMat4("projection", glm::value_ptr(projection));
+	blendShapeShaderProgram->setVec3("viewPos", glm::value_ptr(theCam.Position));
 
 	/*
 	model = glm::rotate(model, glm::pi<float>()*3/2, glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 	model = glm::translate(model, glm::vec3(-5.0f, -5.0f, -20.0f)); // translate it down so it's at the center of the scene
 	*/
-	/*
 	// For 3DDFA
+	model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));	// it's a bit too big for our scene, so scale it down
 	model = glm::rotate(model, glm::pi<float>()/2, glm::vec3(0.0f, 0.0f, 1.0f));	
 	model = glm::rotate(model, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));	
 	model = glm::rotate(model, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));	
-	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 	model = glm::translate(model, glm::vec3(-10.0f, -5.0f, -24.0f)); // translate it down so it's at the center of the scene
-	*/
+	/*
 	// For RingNet
 	model = glm::rotate(model, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));	
 
 	model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));	// it's a bit too big for our scene, so scale it down
 	// Note: the y axis is inverted...and z point in the screen
 	model = glm::translate(model, glm::vec3(-4.5f, -7.5f, 14.0f)); 
+	*/
 
 	// model = glm::rotate(model, glm::pi<float>()/6, glm::vec3(0.0f, 1.0f, 0.0f));
-	shaderProgram->setMat4("model", glm::value_ptr(model));
+	blendShapeShaderProgram->setMat4("model", glm::value_ptr(model));
 	// DatCustom::FaceModel::PCAFaceModelManager::instance().Draw(*shaderProgram);
-	theMesh->Draw(*shaderProgram);
+	theBlendShape->Draw(*blendShapeShaderProgram, blendShapeindices, weights);
 }
 
 

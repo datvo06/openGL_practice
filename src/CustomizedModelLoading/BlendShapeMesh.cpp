@@ -9,7 +9,7 @@ namespace DatCustom{
 		}
 		ColoredBlendShapeMesh::~ColoredBlendShapeMesh(){
 			// printf("Deleting ColoredBlendShape\n");
-			glDeleteBuffers(VBOs.size(), &VBOs[0]);
+			glDeleteBuffers(1, &VBO);
 			glDeleteBuffers(1, &EBO);
 			glDeleteVertexArrays(1, &VAO);
 		}
@@ -23,10 +23,13 @@ namespace DatCustom{
 			bHasDistincColors(bHasDiffColors)
 		{
 			this->indices.resize(listCtmMeshes[0].mIndices.size());
+			printf("Pushing all vertices into internal format....\n");
 			// Scaling is not possible anymore since we will have to consider multiple meshes
 			// TODO: Research on this
 			for (size_t i = 0; i < listCtmMeshes.size(); i++){
+				printf("Allocating mem for %d%s mesh....\n", (int)i, i == 1 ? "st" : "th");
 				this->vertices.push_back(std::vector<ColoredVertex>(listCtmMeshes[i].mVertices.size()));
+				printf("Assigning each vertex for %d%s mesh....\n", (int)i, i == 1 ? "st" : "th");
 				for (size_t j = 0; j < listCtmMeshes[i].mVertices.size(); j++){
 					this->vertices[i][j].Position = {
 						listCtmMeshes[i].mVertices[j].x,
@@ -51,6 +54,7 @@ namespace DatCustom{
 					}
 				}
 			}
+			printf("Copying the indices....\n");
 			// And Copy indices as well
 			for (size_t i = 0; i < listCtmMeshes[0].mIndices.size(); i++){
 				this->indices[i] = listCtmMeshes[0].mIndices[i];
@@ -61,17 +65,22 @@ namespace DatCustom{
 
 		void ColoredBlendShapeMesh::setupMesh(){
 			// print("Generating VAO, VBOs and EBO)
-			VBOs.resize(this->vertices.size());
 			glGenVertexArrays(1, &VAO);
-			glGenBuffers((GLuint) this->vertices.size(), &VBOs[0]);
+			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
 
 			glBindVertexArray(VAO);
 			// Let's upload vertices on all buffers
-			for (size_t i = 0; i < VBOs.size(); i++){
-				glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]);
-				glBufferData(GL_ARRAY_BUFFER, vertices[i].size() * sizeof(ColoredVertex), &vertices[i][0],
-						GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(
+					GL_ARRAY_BUFFER,
+				 	vertices[0].size() * sizeof(ColoredVertex)*vertices.size(),
+				 	NULL,
+					GL_STATIC_DRAW);
+			for (size_t i = 0; i < vertices.size(); i++){
+				glBufferSubData(GL_ARRAY_BUFFER, vertices[0].size() * sizeof(ColoredVertex) * i,
+												vertices[i].size() * sizeof(ColoredVertex), &vertices[i][0]);
+
 			}
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
@@ -80,7 +89,7 @@ namespace DatCustom{
 			glBindVertexArray(0);
 		}
 
-		void ColoredBlendShapeMesh::Draw(Shader shader, std::vector<unsigned int> indices,
+		void ColoredBlendShapeMesh::Draw(Shader shader, std::vector<unsigned int> blendShapeIndices,
 				std::vector<float> weights){
 			shader.setBool("hasTexture", false);
 			glBindVertexArray(this->VAO);
@@ -89,10 +98,10 @@ namespace DatCustom{
 			size_t vert_sizes[] = {3, 3, 4};
 
 			// set number of active blendshape
-			shader.setInt("nBlendShape", indices.size());
-			for (auto elem: Iterator::index(indices)){
+			shader.setInt("nBlendShape", blendShapeIndices.size());
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			for (auto elem: Iterator::index(blendShapeIndices)){
 				auto i = elem.first; auto index = elem.second;
-				glBindBuffer(GL_ARRAY_BUFFER, VBOs[index]);
 				std::vector<int> vertexAttrib = {0, 1, 2};
 				if (i != 0){
 					if (bHasDistincColors){
@@ -110,7 +119,7 @@ namespace DatCustom{
 					glVertexAttribPointer(
 							attribElem.second,
 							vert_sizes[attribElem.first], GL_FLOAT, GL_FALSE, sizeof(ColoredVertex),
-							(void*)(attribElem.first*offsetof(ColoredVertex, Normal)));
+							(void*)(sizeof(ColoredVertex)*index*vertices[0].size()+attribElem.first*offsetof(ColoredVertex, Normal)));
 				}
 				// set shader uniform as well
 				shader.setFloat("weights[" + std::to_string(i) + "]", weights[i]);

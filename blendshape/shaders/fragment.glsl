@@ -107,6 +107,7 @@ void main()
 	vec3 R = refract(-viewDir, norm, ratio);
 	// vec3 result = CalcDirLight(dirlight, norm, viewDir);
 	vec3 result = vertexColor.rgb;
+	// vec3 result = vec3(1.0f, 1.0f, 1.0f);
 	for (int i = 0; i < NR_POINT_LIGHTS; i++){
 		result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
 	}

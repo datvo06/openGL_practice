@@ -10,7 +10,7 @@ namespace DatCustom{
 					virtual void Draw(Shader shader,
 							std::vector<unsigned int> indices, std::vector<float> weights) = 0;
 					virtual GLuint getVAO() = 0;
-					virtual std::vector<GLuint> getVBOs() = 0;
+					virtual GLuint getVBO() = 0;
 					virtual GLuint getEBO() = 0;
 					virtual ~BlendShapeMesh(){
 						printf("Deleting BlendShapeMesh...\n");
@@ -29,12 +29,11 @@ namespace DatCustom{
 				ColoredBlendShapeMesh();
 				void Draw(Shader shader, std::vector<unsigned int> indices, std::vector<float> weights);
 				virtual GLuint getVAO() {return VAO;}
-				virtual std::vector<GLuint>getVBOs() {return VBOs;}
+				virtual GLuint getVBO() {return VBO;}
 				virtual GLuint getEBO() {return EBO;}
 				virtual ~ColoredBlendShapeMesh();
 			private:
-				std::vector<GLuint> VBOs;
-				GLuint VAO, EBO;
+				GLuint VAO, VBO, EBO;
 				bool bHasDistincColors;
 				void setupMesh();
 		};

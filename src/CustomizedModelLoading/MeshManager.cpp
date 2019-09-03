@@ -61,15 +61,19 @@ DatCustom::Graphics::MeshPtr MeshManager::loadStaticMesh(const char* filePath){
 }
 
 
-DatCustom::Graphics::BlendShapeMeshPtr createBlendShapeMeshFromListCTMs(std::vector<CTM::Mesh>& listCtmMeshes){
+DatCustom::Graphics::BlendShapeMeshPtr MeshManager::createBlendShapeMeshFromListCTMs(std::vector<CTM::Mesh>& listCtmMeshes){
 	if (!listCtmMeshes[0].HasNormals()){
+		printf("Calculating normals for all the meshes...\n");
 		// Let's calculate normals for it
-		for (auto ctmMesh: listCtmMeshes) ctmMesh.CalculateNormals();
+		for (size_t i = 0; i < listCtmMeshes.size(); i++){
+				listCtmMeshes[i].CalculateNormals();
+		}
 	}
 	// Still assigning colors, but doing nothing with it for now
 	if (!listCtmMeshes[0].HasTexCoords()) {
+		printf("Pushing all meshes into one colored blendshape...\n");
 		// Get vector of vertex, color, etc
-		return std::unique_ptr<DatCustom::Graphics::ColoredBlendShapeMesh>(new DatCustom::Graphics::ColoredBlendShapeMesh(listCtmMeshes));
+		return std::unique_ptr<DatCustom::Graphics::ColoredBlendShapeMesh>(new DatCustom::Graphics::ColoredBlendShapeMesh(listCtmMeshes, true));
 	}
 	else{
 		// No texture for now...
@@ -85,20 +89,24 @@ DatCustom::Graphics::BlendShapeMeshPtr createBlendShapeMeshFromListCTMs(std::vec
 	}
 }
 
-DatCustom::Graphics::BlendShapeMeshPtr loadStaticBlendShape(const char** filePaths, int numBlendShape){
+DatCustom::Graphics::BlendShapeMeshPtr MeshManager::loadStaticBlendShape(std::vector<std::string> filePaths){
 	std::vector<CTM::Mesh> ctmMeshes;
+	int numBlendShape = filePaths.size();
 	for (int i = 0; i < numBlendShape; i++){
 		CTM::Mesh ctmMesh;
 		using std::string;
 		std::string fileExt = UpperCase(ExtractFileExt(std::string(filePaths[i])));
 		try{
-			CTM::ImportMesh(filePaths[i], &ctmMesh);
-			std::string sfilePath (filePaths[i]);
+			printf("Importing %dth mesh\n", (int)i);
+			CTM::ImportMesh(filePaths[i].c_str(), &ctmMesh);
+			std::string sfilePath (filePaths[i].c_str());
 			std::string delimiter = ".";
-			std::string filename = sfilePath.substr(0, sfilePath.find(delimiter)); // token is "scott"
+			std::string filename = sfilePath.substr(0, sfilePath.find(delimiter));
+			/*
 			if (ctmMesh.mTexFileName == ""){
 				ctmMesh.mTexFileName = std::string(filename) + "_texture.png";
 			}
+			*/
 			ctmMeshes.push_back(ctmMesh);
 		}
 		catch (std::runtime_error e){
@@ -106,5 +114,7 @@ DatCustom::Graphics::BlendShapeMeshPtr loadStaticBlendShape(const char** filePat
 			printf("ERROR loading Blendshape: Filetype not supported!!\n");
 		}
 	}
+	printf("Loaded %d meshes for blendshape\n", (int)filePaths.size());
+
 	return createBlendShapeMeshFromListCTMs(ctmMeshes);
 }
