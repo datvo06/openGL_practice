@@ -63,12 +63,12 @@ namespace DatCustom{
 		}
 		void ColoredMesh::setupMesh()
 		{
-			printf("Gen Here 0\n");
+			// printf("Gen Here 0\n");
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
 
-			printf("Gen Here 1\n");
+			// printf("Gen Here 1\n");
 			glBindVertexArray(VAO);
 
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -79,7 +79,7 @@ namespace DatCustom{
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
 					&indices[0], GL_STATIC_DRAW);
 
-			printf("Gen Here 2\n");
+			// printf("Gen Here 2\n");
 			// vertex positions
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), (void*)0);
@@ -94,12 +94,10 @@ namespace DatCustom{
 
 		void ColoredMesh::Draw(Shader shader){
 			shader.setBool("hasTexture", false);
-			glDisable(GL_CULL_FACE);
 			// draw mesh
 			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
-			glEnable(GL_CULL_FACE);
 		}
 
 	}

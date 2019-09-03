@@ -387,7 +387,9 @@ void render(){
 			*/
 
 	// printf("Here1\n");
+	glDisable(GL_CULL_FACE);
 	draw_model(theCamera);
+	glEnable(GL_CULL_FACE);
 	// printf("Here2\n");
 	draw_lamp(theCamera);
 	draw_cubemap(theCamera);
