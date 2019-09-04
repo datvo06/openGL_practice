@@ -76,16 +76,12 @@ DatCustom::Graphics::BlendShapeMeshPtr MeshManager::createBlendShapeMeshFromList
 		return std::unique_ptr<DatCustom::Graphics::ColoredBlendShapeMesh>(new DatCustom::Graphics::ColoredBlendShapeMesh(listCtmMeshes, true));
 	}
 	else{
-		// No texture for now...
-		return std::unique_ptr<DatCustom::Graphics::ColoredBlendShapeMesh>(new DatCustom::Graphics::ColoredBlendShapeMesh(listCtmMeshes));
-		/*
 		try{
-			return std::unique_ptr<glMesh>(new TexturedMesh(ctmMesh));
+			return std::unique_ptr<DatCustom::Graphics::TexturedBlendShapeMesh>(
+					new TexturedBlendShapeMesh(listCtmMeshes));
+		} catch (std::logic_error e){
+			return std::unique_ptr<DatCustom::Graphics::ColoredBlendShapeMesh>(new DatCustom::Graphics::ColoredBlendShapeMesh(listCtmMeshes));
 		}
-		catch (std::logic_error e){
-			return std::unique_ptr<glMesh>(new ColoredMesh(ctmMesh));
-		}
-		*/
 	}
 }
 
@@ -102,11 +98,9 @@ DatCustom::Graphics::BlendShapeMeshPtr MeshManager::loadStaticBlendShape(std::ve
 			std::string sfilePath (filePaths[i].c_str());
 			std::string delimiter = ".";
 			std::string filename = sfilePath.substr(0, sfilePath.find(delimiter));
-			/*
 			if (ctmMesh.mTexFileName == ""){
 				ctmMesh.mTexFileName = std::string(filename) + "_texture.png";
 			}
-			*/
 			ctmMeshes.push_back(ctmMesh);
 		}
 		catch (std::runtime_error e){

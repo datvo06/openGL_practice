@@ -12,7 +12,6 @@ namespace DatCustom{
 			setupMesh();
 		}
 
-
 		TexturedMesh::TexturedMesh(){
 		}
 		TexturedMesh::~TexturedMesh(){

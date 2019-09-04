@@ -37,6 +37,28 @@ namespace DatCustom{
 				bool bHasDistincColors;
 				void setupMesh();
 		};
+
+		class TexturedBlendShapeMesh: public BlendShapeMesh{
+			public:
+				std::vector<std::vector<TexturedVertex>> vertices;
+				std::vector<GLuint> indices;
+				std::vector<Texture> textures;
+				TexturedBlendShapeMesh(
+							std::vector<std::vector<TexturedVertex>> texturedvertices,
+							std::vector<GLuint> indices, std::vector<Texture> textures
+				);
+				TexturedBlendShapeMesh(std::vector<CTM::Mesh>& listCtmMeshes);
+				TexturedBlendShapeMesh();
+				virtual GLuint getVAO() { return VAO; };
+				virtual GLuint getVBO() { return VBO; };
+				virtual GLuint getEBO() { return EBO; };
+
+				void Draw(Shader shader, std::vector<unsigned int> indices, std::vector<float> weights);
+				virtual ~TexturedBlendShapeMesh();
+			private:
+				GLuint VAO, VBO, EBO;
+				void setupMesh();
+		};
 	}
 }
 
