@@ -5,4 +5,5 @@ Install eigen
 Build hdf5 and matio following the instruction on matio site, (remember to enable mat73)
 Install OpenCTM (in the repo)
 build assimp
+install dlib
 Replace your library in the lib folder
