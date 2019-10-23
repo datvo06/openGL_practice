@@ -22,6 +22,7 @@ add_library(datcustom SHARED
 	../src/CustomizedModelLoading/Model.cpp ../src/CustomizedModelLoading/Texture.cpp
 	../src/CustomizedModelLoading/TexturedMesh.cpp ../src/CustomizedModelLoading/TextureManager.cpp
 	../src/CustomizedUtils/GLImagesRenderer.cpp ../src/graphics_utils.cpp
+	../src/CustomizedModelLoading/BlendShapeMesh.cpp
 	../src/string_utils.cpp ../src/general_utils.cpp ../src/general/log.cpp
 	../src/FaceModel/PCAFaceModel.cpp ../src/FileUtils.cpp
 	)

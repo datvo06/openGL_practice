@@ -16,7 +16,7 @@ for i in range(1, 1000):
     zero_original_frame = cv2.imread(
         os.path.join(sys.argv[1], str(i) + '.jpg'))
     # zero_data = cv2.imread('fitted/' + str(i) + '.jpg')
-    zero_data = cv2.imread('./data/frame_' + str(i) + '.jpg')
+    zero_data = cv2.imread(os.path.join(sys.argv[2], 'frame_' + str(i) + '.jpg'))
     zero_data_resized = cv2.resize(zero_data,
                                    (int(zero_original_frame.shape[0]/600.0*800),
                                    zero_original_frame.shape[0]),

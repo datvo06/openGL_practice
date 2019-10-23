@@ -30,6 +30,8 @@ void render();
 void terminate();
 
 MeshPtr theMesh;
+std::string input_folder;
+std::string output_folder;
 
 GLfloat quadVertices[] = {
 	1.0f, 1.0f, 0.0f, 1.0f, 1.0f,		// top right
@@ -43,50 +45,6 @@ GLuint quadIndices[] = {
 	2, 1, 3
 };
 
-GLfloat vertices[] = {
-	// positions          // normals           // texture coords
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-	0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-	0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-	0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-	0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-	0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-	0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-	0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-	0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-	0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-	0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-	0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-	0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-	0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-};
 
 GLfloat cubeVertices[] = {
 	// positions          // normals           // texture coords
@@ -205,7 +163,7 @@ std::vector<std::string> cubeFaces{
 
 GLuint cubemapTexture;
 
-int main (int, char** )
+int main (int argc, char** argv)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -230,6 +188,16 @@ int main (int, char** )
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	if (argc > 2){
+		output_folder = argv[2];
+	}
+	else output_folder = std::string("data");
+	if (argc > 1){
+		input_folder = argv[1];
+	}
+	else{
+		input_folder = std::string("flame_objs");
+	}
 	init();
 	while(!glfwWindowShouldClose(window)){
 		nextTime = glfwGetTime();
@@ -281,7 +249,7 @@ void init(){
 	// 0. Bind VAO
 	// 1. Setup buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	// 2. Vertex Attribute pointer
@@ -338,7 +306,7 @@ void render(){
 	 // Let's load the ith model
 		//printf("Here0\n");
 
-	 theMesh.reset(&*MeshManager::instance().loadStaticMesh(("flame_objs_with_colors_nick/" + std::to_string((gTempModelCount-1)%1000+1) + "_0.obj").c_str()));
+	 theMesh.reset(&*MeshManager::instance().loadStaticMesh((input_folder + "/" + std::to_string((gTempModelCount-1)%1000+1) + "_0.obj").c_str()));
 	 printf("Current Temp Model Count: %d\n", gTempModelCount);
 	 // printf("Here1\n");
 	 if (sumDeltaTime >= 1.0/30){
@@ -375,7 +343,8 @@ void render(){
 	// 4. draw
 	// 4.1 Render with new framebuffer bound
 	DatCustom::Graphics::RenderToImageManager::instance().use();
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	// glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -387,12 +356,10 @@ void render(){
 			*/
 
 	// printf("Here1\n");
-	glDisable(GL_CULL_FACE);
 	draw_model(theCamera);
-	glEnable(GL_CULL_FACE);
 	// printf("Here2\n");
 	draw_lamp(theCamera);
-	draw_cubemap(theCamera);
+	// draw_cubemap(theCamera);
 
 	// 4.2 Bind to default framebuffer
 
@@ -404,7 +371,7 @@ void render(){
 	// printf("Here3\n");
 	cv::Mat imout = DatCustom::Graphics::RenderToImageManager::instance().getOutputFrame();
 	// printf("Here4\n");
-	cv::imwrite((std::string("data/frame_") + std::to_string((gTempModelCount-1)%1000+1) + ".jpg").c_str(), imout);
+	cv::imwrite((std::string(output_folder + "/frame_") + std::to_string((gTempModelCount-1)%1000+1) + ".jpg").c_str(), imout);
 	 gTempModelCount += 1;
 }
 
@@ -488,7 +455,7 @@ void draw_lamp(Camera& theCam){
 	for (int i = 0; i < 4; i++){
 		glm::mat4 model;
 	 	model	= glm::translate(model, pointLightPositions[i]);
-		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::scale(model, glm::vec3(0.1f));
 		lampProgram->setMat4("model", glm::value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}

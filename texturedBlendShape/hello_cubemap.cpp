@@ -507,7 +507,6 @@ void draw_lamp(Camera& theCam){
 }
 
 
-
 void draw_cubemap(Camera& theCam){
 	glDisable(GL_CULL_FACE);
 	glDepthFunc(GL_LEQUAL);
