@@ -216,7 +216,7 @@ int main (int argc, char** argv)
 
 
 void init(){
-	theMesh = MeshManager::instance().loadStaticMesh("1.obj");
+	theMesh = MeshManager::instance().loadStaticMesh("nick_obj/0.obj");
 	std::cout << "Loading Shader..." << std::endl;
 	// Let's get the total number of frames... for now
 	cubemapTexture = DatCustom::Graphics::loadCubemap(cubeFaces);
@@ -306,7 +306,7 @@ void render(){
 	 // Let's load the ith model
 		//printf("Here0\n");
 
-	 theMesh.reset(&*MeshManager::instance().loadStaticMesh((input_folder + "/" + std::to_string((gTempModelCount-1)%1000+1) + "_0.obj").c_str()));
+	 theMesh.reset(&*MeshManager::instance().loadStaticMesh((input_folder + "/" + std::to_string((gTempModelCount-1)%1000+1) + ".obj").c_str()));
 	 printf("Current Temp Model Count: %d\n", gTempModelCount);
 	 // printf("Here1\n");
 	 if (sumDeltaTime >= 1.0/30){
@@ -420,18 +420,18 @@ void draw_model(Camera& theCam){
 	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 	model = glm::translate(model, glm::vec3(-5.0f, -5.0f, -20.0f)); // translate it down so it's at the center of the scene
 	*/
-	/*
 	// For 3DDFA
-	model = glm::rotate(model, glm::pi<float>()/2, glm::vec3(0.0f, 0.0f, 1.0f));	
+	model = glm::translate(model, glm::vec3(0.0f, 1.5f, -8.0f)); // translate it down so it's at the center of the scene
+	model = glm::rotate(model, glm::pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));	
 	model = glm::rotate(model, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f));	
 	model = glm::rotate(model, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));	
 	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-	model = glm::translate(model, glm::vec3(-10.0f, -5.0f, -24.0f)); // translate it down so it's at the center of the scene
-	*/
 	// For RingNet
+	/*
 	model = glm::rotate(model, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));	
 
 	model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));	// it's a bit too big for our scene, so scale it down
+	*/
 	// Note: the y axis is inverted...and z point in the screen
 	model = glm::translate(model, glm::vec3(-4.5f, -7.5f, 14.0f)); 
 
